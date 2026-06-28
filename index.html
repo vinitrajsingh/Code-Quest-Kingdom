@@ -170,44 +170,23 @@
       <main class="kingdom-stage">
         <div class="kingdom-banner">
           <h2>Variables &amp; Data Types</h2>
-          <p>4 areas · 1 boss</p>
+          <p id="kingdom-area-progress">0 / 5 areas cleared</p>
         </div>
-        <div class="kingdom-path">
-          <button type="button" class="path-node path-done" data-area="0">
-            <span class="path-dot"></span>
-            <span class="path-name">Forest Entrance</span>
-          </button>
-          <button type="button" class="path-node path-active" data-area="1">
-            <span class="path-dot"></span>
-            <span class="path-name">Variable Grove</span>
-          </button>
-          <button type="button" class="path-node path-locked" data-area="2" disabled>
-            <span class="path-dot"></span>
-            <span class="path-name">Data Stream</span>
-          </button>
-          <button type="button" class="path-node path-locked" data-area="3" disabled>
-            <span class="path-dot"></span>
-            <span class="path-name">Operator Bridge</span>
-          </button>
-          <button type="button" class="path-node path-boss path-locked" data-area="boss" disabled>
-            <span class="path-dot"></span>
-            <span class="path-name">Corrupted Guardian</span>
-          </button>
-        </div>
+        <div class="kingdom-path" id="kingdom-path"></div>
       </main>
     </section>
 
     <section id="screen-dialogue" class="screen screen-overlay" data-screen="dialogue">
       <div class="dialogue-box panel panel-cut">
         <div class="dialogue-portrait">
-          <span class="portrait-frame">🧙</span>
+          <span class="portrait-frame" id="dialogue-portrait">🧙</span>
         </div>
         <div class="dialogue-body">
-          <span class="dialogue-name">Elder Syntax</span>
-          <p class="dialogue-text">Traveler, the bridge stones only shift for those who speak the language of variables. Will you try?</p>
+          <span class="dialogue-name" id="dialogue-name">Elder Syntax</span>
+          <p class="dialogue-text" id="dialogue-text"></p>
           <div class="dialogue-actions">
-            <button type="button" class="btn-ghost" data-route="kingdom">Not Now</button>
-            <button type="button" class="btn-primary" data-route="quest-brief">Accept Quest</button>
+            <button type="button" class="btn-ghost" id="dialogue-later">Not Now</button>
+            <button type="button" class="btn-primary" id="dialogue-accept" disabled>Accept Quest</button>
           </div>
         </div>
       </div>
@@ -215,20 +194,31 @@
 
     <section id="screen-quest-brief" class="screen" data-screen="quest-brief">
       <div class="brief-wrap panel panel-cut">
-        <span class="brief-type">Side Quest</span>
-        <h2 class="brief-title">Fix the Operator Bridge</h2>
-        <p class="brief-objective">Complete 3 coding trials to restore passage.</p>
+        <span class="brief-type" id="brief-type">Forest Quest</span>
+        <h2 class="brief-title" id="brief-title">Quest Title</h2>
+        <p class="brief-objective" id="brief-objective">Objective</p>
         <ul class="brief-rewards">
-          <li><span>+50</span> XP</li>
-          <li><span>+20</span> Coins</li>
-          <li><span>?</span> Item chance</li>
+          <li><span id="brief-xp">+0</span> XP</li>
+          <li><span id="brief-coins">+0</span> Coins</li>
+          <li><span id="brief-trials">3</span> trials</li>
         </ul>
         <div class="brief-meta">
-          <span class="brief-diff">★★☆</span>
-          <span class="brief-time">⏱ ~5 min par</span>
+          <span class="brief-diff" id="brief-diff">★☆☆</span>
+          <span class="brief-time" id="brief-time">⏱ ~5 min par</span>
         </div>
-        <button type="button" class="btn-primary btn-wide" data-route="challenge">Start Quest</button>
-        <button type="button" class="btn-ghost btn-wide" data-route="kingdom">Return</button>
+        <button type="button" class="btn-primary btn-wide" id="brief-start">Start Quest</button>
+        <button type="button" class="btn-ghost btn-wide" id="brief-back">Return</button>
+      </div>
+    </section>
+
+    <section id="screen-quest-preview" class="screen" data-screen="quest-preview">
+      <div class="preview-wrap panel panel-cut">
+        <span class="preview-badge">Stage 5 Preview</span>
+        <h2 class="preview-title" id="preview-title">Quest</h2>
+        <p class="preview-sub" id="preview-sub">Trials loading soon.</p>
+        <p class="preview-note">Complete this quest now to unlock the next area. Real coding challenges arrive in Stage 5.</p>
+        <button type="button" class="btn-primary btn-wide" id="preview-complete">Complete Quest</button>
+        <button type="button" class="btn-ghost btn-wide" id="preview-back">Return to Path</button>
       </div>
     </section>
 
@@ -382,7 +372,7 @@ System.out.println(a++);</code></pre>
     <button type="button" data-route="profile" class="devnav-btn">Profile</button>
     <button type="button" data-route="kingdom" class="devnav-btn">Kingdom</button>
     <button type="button" data-route="dialogue" class="devnav-btn">Dialogue</button>
-    <button type="button" data-route="quest-brief" class="devnav-btn">Brief</button>
+    <button type="button" data-route="quest-preview" class="devnav-btn">Preview</button>
     <button type="button" data-route="challenge" class="devnav-btn">Challenge</button>
     <button type="button" data-route="result" class="devnav-btn">Result</button>
     <button type="button" data-route="boss-intro" class="devnav-btn">Boss Intro</button>

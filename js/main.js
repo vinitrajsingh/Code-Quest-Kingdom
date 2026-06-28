@@ -1,11 +1,15 @@
 import { initRouter, goTo, currentScreen, setSessionCheck, setOnNavigate } from './router.js';
 import {
   initState, isLoggedIn, registerKnight, loginKnight, resumeSession, logout,
-  markIntroSeen, getPlayer, getAllProfiles, clearKingdom,
+  markIntroSeen, getPlayer, getAllProfiles, clearKingdom, getCurrentKingdom,
 } from './state.js';
 import { loadSession } from './storage.js';
 import { syncHud, renderProfile, renderKnightList, setAuthTab, getSelectedAvatar, bindAvatarPicker } from './ui.js';
 import { loadKingdoms, renderWorldMap, bindMapEvents, renderKingdomHeader, showMapToast } from './map.js';
+import {
+  preloadQuests, renderKingdomHub, bindKingdomPath, openDialogue, renderQuestBrief,
+  renderQuestPreview, finishQuestPreview, getActiveQuest, showReplayDialogue,
+} from './kingdom.js';
 
 const STUB_LABELS = {
   inventory: { title: 'Inventory', desc: 'Items and consumables arrive in Stage 7.' },
@@ -48,7 +52,10 @@ function handleNavigate(name) {
   if (name === 'map') renderWorldMap();
   if (name === 'profile') renderProfile();
   if (name === 'auth') refreshAuth();
-  if (name === 'kingdom') renderKingdomHeader();
+  if (name === 'kingdom') {
+    renderKingdomHeader();
+    renderKingdomHub();
+  }
   syncNavHighlight(name);
 }
 
@@ -173,13 +180,14 @@ function bindMap() {
   bindMapEvents(() => goTo('kingdom'));
 }
 
-function bindDevTools() {
-  document.getElementById('dev-clear-forest')?.addEventListener('click', () => {
-    if (!isLoggedIn()) return;
-    clearKingdom('forest');
-    renderWorldMap();
-    showMapToast('Forest restored — Loop Village unlocked');
-  });
+function openQuestFlow(mode, quest) {
+  if (mode === 'replay') {
+    showReplayDialogue(quest);
+    goTo('dialogue');
+    return;
+  }
+  openDialogue(quest);
+  goTo('dialogue');
 }
 
 function bindKingdom() {
@@ -187,7 +195,53 @@ function bindKingdom() {
     renderWorldMap();
     goTo('map');
   });
-  document.querySelector('.path-active')?.addEventListener('click', () => goTo('dialogue'));
+
+  bindKingdomPath(openQuestFlow);
+
+  document.getElementById('dialogue-later')?.addEventListener('click', () => goTo('kingdom'));
+
+  document.getElementById('dialogue-accept')?.addEventListener('click', () => {
+    const quest = getActiveQuest();
+    if (!quest) return;
+    renderQuestBrief(quest);
+    goTo('quest-brief');
+  });
+
+  document.getElementById('brief-back')?.addEventListener('click', () => goTo('kingdom'));
+
+  document.getElementById('brief-start')?.addEventListener('click', () => {
+    const quest = getActiveQuest();
+    if (!quest) return;
+    renderQuestPreview(quest);
+    goTo('quest-preview');
+  });
+
+  document.getElementById('preview-back')?.addEventListener('click', () => goTo('kingdom'));
+
+  document.getElementById('preview-complete')?.addEventListener('click', async () => {
+    const quest = getActiveQuest();
+    if (!quest) return;
+    const outcome = await finishQuestPreview();
+    syncHud();
+    await renderKingdomHub();
+    renderWorldMap();
+    if (outcome === 'boss') {
+      clearKingdom(getCurrentKingdom());
+      renderWorldMap();
+      goTo('kingdom-cleared');
+    } else {
+      goTo('kingdom');
+    }
+  });
+}
+
+function bindDevTools() {
+  document.getElementById('dev-clear-forest')?.addEventListener('click', () => {
+    if (!isLoggedIn()) return;
+    clearKingdom('forest');
+    renderWorldMap();
+    showMapToast('Forest restored — Loop Village unlocked');
+  });
 }
 
 function bindProfile() {
@@ -233,6 +287,7 @@ async function boot() {
   initState();
   initRouter();
   await loadKingdoms();
+  await preloadQuests();
   setSessionCheck(() => isLoggedIn());
   setOnNavigate(handleNavigate);
 

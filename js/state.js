@@ -28,6 +28,9 @@ function ensureKingdoms(p) {
     } else {
       p.kingdoms[id] = { ...defaults[id], ...p.kingdoms[id] };
     }
+    if (!p.kingdoms[id].completedQuests) {
+      p.kingdoms[id].completedQuests = [];
+    }
   });
 }
 
@@ -208,4 +211,25 @@ export function clearedKingdomCount() {
 
 export function getKingdomOrder() {
   return [...KINGDOM_ORDER];
+}
+
+export function getCompletedQuests(kingdomId) {
+  return player?.kingdoms?.[kingdomId]?.completedQuests || [];
+}
+
+export function isQuestDone(kingdomId, questId) {
+  return getCompletedQuests(kingdomId).includes(questId);
+}
+
+export function completeQuest(kingdomId, questId, totalQuests) {
+  if (!player?.kingdoms?.[kingdomId]) return;
+  const k = player.kingdoms[kingdomId];
+  if (!k.completedQuests.includes(questId)) {
+    k.completedQuests.push(questId);
+  }
+  k.progress = Math.min(100, Math.round((k.completedQuests.length / totalQuests) * 100));
+  if (k.completedQuests.length >= totalQuests) {
+    k.progress = 100;
+  }
+  flush();
 }

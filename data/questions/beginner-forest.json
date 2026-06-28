@@ -1,0 +1,90 @@
+{
+  "kingdomId": "forest",
+  "quests": [
+    {
+      "id": "entrance",
+      "area": "Forest Entrance",
+      "order": 0,
+      "type": "quest",
+      "npc": {
+        "name": "Gatekeeper Null",
+        "portrait": "🗿",
+        "dialogue": "Halt, knight. Before you step deeper, prove you know what a variable truly is — a named box that holds value."
+      },
+      "title": "Whispers at the Gate",
+      "objective": "Pass 3 trials on variables and naming.",
+      "rewards": { "xp": 40, "coins": 15 },
+      "difficulty": 1,
+      "parMinutes": 4,
+      "trials": 3
+    },
+    {
+      "id": "grove",
+      "area": "Variable Grove",
+      "order": 1,
+      "type": "quest",
+      "npc": {
+        "name": "Elder Syntax",
+        "portrait": "🧙",
+        "dialogue": "These groves twist when types mix wrongly. int, double, boolean — speak their tongues and the path will straighten."
+      },
+      "title": "Grove of Types",
+      "objective": "Master data type trials among the ancient trees.",
+      "rewards": { "xp": 50, "coins": 18 },
+      "difficulty": 1,
+      "parMinutes": 5,
+      "trials": 3
+    },
+    {
+      "id": "stream",
+      "area": "Data Stream",
+      "order": 2,
+      "type": "quest",
+      "npc": {
+        "name": "Operator Nymph",
+        "portrait": "💧",
+        "dialogue": "The stream flows only when operators align. +, -, *, / — one wrong symbol and the current reverses."
+      },
+      "title": "Current of Operators",
+      "objective": "Solve operator riddles to calm the stream.",
+      "rewards": { "xp": 55, "coins": 20 },
+      "difficulty": 2,
+      "parMinutes": 5,
+      "trials": 3
+    },
+    {
+      "id": "bridge",
+      "area": "Operator Bridge",
+      "order": 3,
+      "type": "quest",
+      "npc": {
+        "name": "Bridge Warden",
+        "portrait": "🌉",
+        "dialogue": "The bridge stones shift with prefix and postfix. Increment truly, or fall into the void below."
+      },
+      "title": "Fix the Operator Bridge",
+      "objective": "Complete mixed trials to restore the crossing.",
+      "rewards": { "xp": 60, "coins": 25 },
+      "difficulty": 2,
+      "parMinutes": 6,
+      "trials": 3
+    },
+    {
+      "id": "boss",
+      "area": "Corrupted Guardian",
+      "order": 4,
+      "type": "boss",
+      "npc": {
+        "name": "Dragon of Increment",
+        "portrait": "🐉",
+        "dialogue": "I am the bug made flesh. Three riddles, knight — fail and the forest stays broken forever."
+      },
+      "title": "Dragon of Increment",
+      "objective": "Survive the guardian's three-phase trial.",
+      "rewards": { "xp": 120, "coins": 50 },
+      "difficulty": 3,
+      "parMinutes": 8,
+      "trials": 3
+    }
+  ]
+}

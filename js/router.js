@@ -1,7 +1,7 @@
 const screens = new Map();
 
 const PROTECTED = new Set([
-  'map', 'kingdom', 'dialogue', 'quest-brief', 'challenge',
+  'map', 'kingdom', 'dialogue', 'quest-brief', 'quest-preview', 'challenge',
   'result', 'boss-intro', 'boss', 'kingdom-cleared', 'stub', 'profile', 'intro',
 ]);
 
