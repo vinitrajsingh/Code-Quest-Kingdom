@@ -121,6 +121,12 @@
   opacity: 0.7;
 }
 
+.field-error {
+  font-size: 0.82rem;
+  color: var(--ember);
+  margin: var(--space-sm) 0 var(--space-md);
+}
+
 .hud-bar {
   display: flex;
   align-items: center;

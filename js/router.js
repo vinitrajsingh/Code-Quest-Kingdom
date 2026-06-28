@@ -1,13 +1,36 @@
 const screens = new Map();
 
+const PROTECTED = new Set([
+  'map', 'kingdom', 'dialogue', 'quest-brief', 'challenge',
+  'result', 'boss-intro', 'boss', 'kingdom-cleared', 'stub', 'profile', 'intro',
+]);
+
+let sessionCheck = () => false;
+let onNavigate = null;
+
 export function initRouter() {
   document.querySelectorAll('.screen').forEach(el => {
     screens.set(el.dataset.screen, el);
   });
 }
 
-export function goTo(name, animate = true) {
-  const target = screens.get(name);
+export function setSessionCheck(fn) {
+  sessionCheck = fn;
+}
+
+export function setOnNavigate(fn) {
+  onNavigate = fn;
+}
+
+export function goTo(name, animate = true, opts = {}) {
+  const bypass = opts.bypass === true;
+  let targetName = name;
+
+  if (!bypass && PROTECTED.has(name) && !sessionCheck()) {
+    targetName = 'auth';
+  }
+
+  const target = screens.get(targetName);
   if (!target) return;
 
   const current = document.querySelector('.screen-active');
@@ -24,9 +47,13 @@ export function goTo(name, animate = true) {
   target.classList.add('screen-active', 'screen-enter');
   setTimeout(() => target.classList.remove('screen-enter'), 400);
 
-  if (name !== 'splash') {
-    history.replaceState(null, '', `#${name}`);
+  if (targetName !== 'splash') {
+    history.replaceState(null, '', `#${targetName}`);
+  } else {
+    history.replaceState(null, '', location.pathname);
   }
+
+  onNavigate?.(targetName);
 }
 
 export function getScreen(name) {
@@ -35,4 +62,8 @@ export function getScreen(name) {
 
 export function currentScreen() {
   return document.querySelector('.screen-active')?.dataset.screen ?? null;
+}
+
+export function isProtected(name) {
+  return PROTECTED.has(name);
 }

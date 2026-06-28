@@ -1,12 +1,59 @@
-import { initRouter, goTo, currentScreen } from './router.js';
+import { initRouter, goTo, currentScreen, setSessionCheck, setOnNavigate } from './router.js';
+import { initState, isLoggedIn, registerKnight, loginKnight, resumeSession, logout, markIntroSeen, getPlayer, getAllProfiles } from './state.js';
+import { loadSession } from './storage.js';
+import { syncHud, renderProfile, renderKnightList, setAuthTab, getSelectedAvatar, bindAvatarPicker } from './ui.js';
 
 const STUB_LABELS = {
   inventory: { title: 'Inventory', desc: 'Items and consumables arrive in Stage 7.' },
-  profile: { title: 'Profile', desc: 'Stats and badges arrive in Stage 7.' },
   leaderboard: { title: 'Leaderboard', desc: 'Local rankings arrive in Stage 7.' },
 };
 
 let introIndex = 0;
+let splashTimer = null;
+
+function finishBoot() {
+  document.body.classList.remove('booting');
+  document.body.classList.add('ready');
+}
+
+function enterGame() {
+  const p = getPlayer();
+  syncHud();
+  if (p?.introSeen) {
+    goTo('map', false);
+  } else {
+    goTo('intro', false);
+  }
+}
+
+function refreshAuth() {
+  renderKnightList(getAllProfiles(), key => {
+    if (loginKnight(key)) enterGame();
+  });
+  const profiles = getAllProfiles();
+  if (profiles.length > 0) {
+    setAuthTab('login');
+  } else {
+    setAuthTab('register');
+  }
+}
+
+function handleNavigate(name) {
+  syncHud();
+  if (name === 'profile') renderProfile();
+  if (name === 'auth') refreshAuth();
+  syncNavHighlight(name);
+}
+
+function syncNavHighlight(screen) {
+  const map = { map: 'map', profile: 'profile' };
+  const active = map[screen];
+  document.querySelectorAll('.bottom-nav').forEach(nav => {
+    nav.querySelectorAll('.nav-item').forEach(item => {
+      item.classList.toggle('nav-active', active && item.dataset.nav === active);
+    });
+  });
+}
 
 function bindRoutes() {
   document.querySelectorAll('[data-route]').forEach(el => {
@@ -19,27 +66,46 @@ function bindRoutes() {
 
 function bindDevNav() {
   document.querySelectorAll('.devnav-btn').forEach(btn => {
-    btn.addEventListener('click', () => goTo(btn.dataset.route));
+    btn.addEventListener('click', () => goTo(btn.dataset.route, true, { bypass: true }));
   });
 }
 
 function bindSplash() {
   const skip = document.getElementById('splash-skip');
-  const auto = setTimeout(() => goTo('auth'), 2200);
-  skip?.addEventListener('click', () => {
-    clearTimeout(auto);
+  const enter = () => {
+    clearTimeout(splashTimer);
+    refreshAuth();
     goTo('auth');
-  });
+  };
+  skip?.addEventListener('click', enter);
+  splashTimer = setTimeout(enter, 2200);
 }
 
 function bindAuth() {
-  const form = document.getElementById('auth-form');
+  document.querySelectorAll('.auth-tab').forEach(tab => {
+    tab.addEventListener('click', () => setAuthTab(tab.dataset.authTab));
+  });
+
+  bindAvatarPicker();
+
+  const form = document.getElementById('auth-register');
+  const errEl = document.getElementById('reg-error');
+
   form?.addEventListener('submit', e => {
     e.preventDefault();
-    const name = document.getElementById('knight-name')?.value.trim();
-    if (name) {
-      document.getElementById('hud-name').textContent = name;
+    const name = document.getElementById('reg-name')?.value || '';
+    const avatar = getSelectedAvatar();
+    const result = registerKnight(name, avatar);
+
+    if (!result.ok) {
+      if (errEl) {
+        errEl.textContent = result.reason;
+        errEl.hidden = false;
+      }
+      return;
     }
+
+    if (errEl) errEl.hidden = true;
     goTo('intro');
   });
 }
@@ -57,15 +123,42 @@ function bindIntro() {
     if (next) next.textContent = i === slides.length - 1 ? 'Begin' : 'Continue';
   }
 
+  function finishIntro() {
+    markIntroSeen();
+    syncHud();
+    goTo('map');
+  }
+
   next?.addEventListener('click', () => {
     if (introIndex < slides.length - 1) {
       showSlide(introIndex + 1);
     } else {
-      goTo('map');
+      finishIntro();
     }
   });
 
-  skip?.addEventListener('click', () => goTo('map'));
+  skip?.addEventListener('click', finishIntro);
+}
+
+function bindNav() {
+  document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const nav = item.dataset.nav;
+      if (nav === 'map') {
+        goTo('map');
+        return;
+      }
+      if (nav === 'profile') {
+        goTo('profile');
+        return;
+      }
+      if (STUB_LABELS[nav]) {
+        document.getElementById('stub-title').textContent = STUB_LABELS[nav].title;
+        document.getElementById('stub-desc').textContent = STUB_LABELS[nav].desc;
+        goTo('stub');
+      }
+    });
+  });
 }
 
 function bindMap() {
@@ -79,26 +172,20 @@ function bindMap() {
       setTimeout(() => node.classList.remove('shake'), 450);
     });
   });
-
-  document.querySelectorAll('.bottom-nav .nav-item').forEach(item => {
-    item.addEventListener('click', () => {
-      const nav = item.dataset.nav;
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('nav-active'));
-      item.classList.add('nav-active');
-      if (nav === 'map') {
-        goTo('map');
-      } else if (STUB_LABELS[nav]) {
-        document.getElementById('stub-title').textContent = STUB_LABELS[nav].title;
-        document.getElementById('stub-desc').textContent = STUB_LABELS[nav].desc;
-        goTo('stub');
-      }
-    });
-  });
 }
 
 function bindKingdom() {
   document.getElementById('kingdom-back')?.addEventListener('click', () => goTo('map'));
   document.querySelector('.path-active')?.addEventListener('click', () => goTo('dialogue'));
+}
+
+function bindProfile() {
+  document.getElementById('profile-back')?.addEventListener('click', () => goTo('map'));
+  document.getElementById('logout-btn')?.addEventListener('click', () => {
+    logout();
+    refreshAuth();
+    goTo('auth');
+  });
 }
 
 function bindOptions() {
@@ -109,13 +196,6 @@ function bindOptions() {
       btn.classList.add('option-selected');
     });
   });
-}
-
-function bindHash() {
-  const hash = location.hash.slice(1);
-  if (hash && hash !== 'splash') {
-    goTo(hash, false);
-  }
 }
 
 function demoTimer() {
@@ -138,14 +218,34 @@ function demoTimer() {
   }, 1000);
 }
 
-initRouter();
-bindRoutes();
-bindDevNav();
-bindSplash();
-bindAuth();
-bindIntro();
-bindMap();
-bindKingdom();
-bindOptions();
-bindHash();
-demoTimer();
+function boot() {
+  initState();
+  initRouter();
+  setSessionCheck(() => isLoggedIn());
+  setOnNavigate(handleNavigate);
+
+  bindRoutes();
+  bindDevNav();
+  bindAuth();
+  bindIntro();
+  bindNav();
+  bindMap();
+  bindKingdom();
+  bindProfile();
+  bindOptions();
+  demoTimer();
+
+  const session = loadSession();
+  if (session?.key && resumeSession(session.key)) {
+    syncHud();
+    enterGame();
+    finishBoot();
+    return;
+  }
+
+  goTo('splash', false);
+  bindSplash();
+  finishBoot();
+}
+
+boot();

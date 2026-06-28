@@ -15,12 +15,12 @@
   <link rel="stylesheet" href="css/screens.css">
   <link rel="stylesheet" href="css/animations.css">
 </head>
-<body>
+<body class="booting">
   <div class="grain" aria-hidden="true"></div>
   <div class="vignette" aria-hidden="true"></div>
 
   <div id="app">
-    <section id="screen-splash" class="screen screen-active" data-screen="splash">
+    <section id="screen-splash" class="screen" data-screen="splash">
       <div class="splash-inner">
         <div class="splash-emblem">
           <svg viewBox="0 0 120 120" class="emblem-svg" aria-hidden="true">
@@ -41,16 +41,38 @@
     <section id="screen-auth" class="screen" data-screen="auth">
       <div class="auth-layout">
         <div class="auth-hero">
-          <p class="auth-kicker">Knight Registration</p>
-          <h2 class="auth-heading">Claim Your Name</h2>
-          <p class="auth-desc">Every legend starts with a single line of code.</p>
+          <p class="auth-kicker">The Realm Awaits</p>
+          <h2 class="auth-heading" id="auth-heading">Forge Your Knight</h2>
+          <p class="auth-desc" id="auth-desc">Choose a name and sigil. Your progress is saved on this device.</p>
         </div>
-        <form class="panel panel-cut auth-form" id="auth-form">
-          <label class="field-label" for="knight-name">Knight Name</label>
-          <input type="text" id="knight-name" class="field-input" placeholder="Sir Variables" maxlength="20" autocomplete="username">
-          <p class="field-hint">Stage 1 preview — full login in Stage 2</p>
-          <button type="submit" class="btn-primary btn-wide">Begin Journey</button>
-        </form>
+        <div class="panel panel-cut auth-panel">
+          <div class="auth-tabs">
+            <button type="button" class="auth-tab auth-tab-active" data-auth-tab="register">New Knight</button>
+            <button type="button" class="auth-tab" data-auth-tab="login">Return</button>
+          </div>
+
+          <form class="auth-pane auth-pane-active" data-auth-pane="register" id="auth-register">
+            <label class="field-label" for="reg-name">Knight Name</label>
+            <input type="text" id="reg-name" class="field-input" placeholder="Sir Variables" maxlength="20" autocomplete="off">
+            <span class="field-label">Choose Sigil</span>
+            <div class="avatar-picker" id="avatar-picker">
+              <button type="button" class="avatar-opt avatar-selected" data-avatar="⚔️">⚔️</button>
+              <button type="button" class="avatar-opt" data-avatar="🛡️">🛡️</button>
+              <button type="button" class="avatar-opt" data-avatar="🏹">🏹</button>
+              <button type="button" class="avatar-opt" data-avatar="✨">✨</button>
+              <button type="button" class="avatar-opt" data-avatar="🗡️">🗡️</button>
+              <button type="button" class="avatar-opt" data-avatar="🦉">🦉</button>
+            </div>
+            <p class="field-error" id="reg-error" hidden></p>
+            <button type="submit" class="btn-primary btn-wide">Begin Journey</button>
+          </form>
+
+          <div class="auth-pane" data-auth-pane="login" id="auth-login">
+            <p class="auth-login-label">Continue as</p>
+            <div class="knight-list" id="knight-list"></div>
+            <p class="auth-empty" id="auth-empty">No knights yet. Forge a new one above.</p>
+          </div>
+        </div>
       </div>
     </section>
 
@@ -86,16 +108,16 @@
     <section id="screen-map" class="screen" data-screen="map">
       <header class="hud-bar">
         <div class="hud-left">
-          <span class="hud-knight" id="hud-name">Knight</span>
-          <span class="hud-level">Lv <strong id="hud-level">1</strong></span>
+          <span class="hud-knight" id="hud-name" data-hud="name">Knight</span>
+          <span class="hud-level">Lv <strong id="hud-level" data-hud="level">1</strong></span>
         </div>
         <div class="hud-center">
           <div class="xp-track">
-            <div class="xp-fill" id="hud-xp-fill" style="width: 12%"></div>
+            <div class="xp-fill" id="hud-xp-fill" data-hud="xp-fill" style="width: 0%"></div>
           </div>
         </div>
         <div class="hud-right">
-          <span class="hud-coin"><span class="coin-icon">◆</span> <strong id="hud-coins">0</strong></span>
+          <span class="hud-coin"><span class="coin-icon">◆</span> <strong id="hud-coins" data-hud="coins">0</strong></span>
         </div>
       </header>
 
@@ -166,7 +188,7 @@
       <header class="hud-bar">
         <button type="button" class="hud-back" id="kingdom-back">← Map</button>
         <span class="hud-title">Beginner Forest</span>
-        <span class="hud-coin"><span class="coin-icon">◆</span> <strong>0</strong></span>
+        <span class="hud-coin"><span class="coin-icon">◆</span> <strong data-hud="coins">0</strong></span>
       </header>
       <main class="kingdom-stage">
         <div class="kingdom-banner">
@@ -326,6 +348,46 @@ System.out.println(a++);</code></pre>
       </div>
     </section>
 
+    <section id="screen-profile" class="screen" data-screen="profile">
+      <header class="hud-bar">
+        <button type="button" class="hud-back" id="profile-back">← Map</button>
+        <span class="hud-title">Knight Profile</span>
+        <span class="hud-coin"><span class="coin-icon">◆</span> <strong data-hud="coins">0</strong></span>
+      </header>
+      <main class="profile-stage">
+        <div class="profile-card panel panel-cut">
+          <span class="profile-avatar" id="profile-avatar" data-hud="avatar">⚔️</span>
+          <h2 class="profile-name" id="profile-name">Knight</h2>
+          <p class="profile-level" id="profile-level">Level 1</p>
+        </div>
+        <dl class="profile-stats">
+          <div><dt>Total XP</dt><dd id="profile-xp">0</dd></div>
+          <div><dt>Coins</dt><dd id="profile-coins">0</dd></div>
+          <div><dt>Accuracy</dt><dd id="profile-accuracy">—</dd></div>
+          <div><dt>Joined</dt><dd id="profile-joined">—</dd></div>
+        </dl>
+        <button type="button" class="btn-ghost btn-wide" id="logout-btn">Leave Realm</button>
+      </main>
+      <nav class="bottom-nav">
+        <button type="button" class="nav-item" data-nav="map">
+          <span class="nav-icon">⌖</span>
+          <span>Map</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="inventory">
+          <span class="nav-icon">⚔</span>
+          <span>Items</span>
+        </button>
+        <button type="button" class="nav-item nav-active" data-nav="profile">
+          <span class="nav-icon">◉</span>
+          <span>Profile</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="leaderboard">
+          <span class="nav-icon">▲</span>
+          <span>Ranks</span>
+        </button>
+      </nav>
+    </section>
+
     <section id="screen-stub" class="screen" data-screen="stub">
       <div class="stub-wrap panel panel-cut">
         <h2 id="stub-title">Coming Soon</h2>
@@ -335,11 +397,12 @@ System.out.println(a++);</code></pre>
     </section>
   </div>
 
-  <aside id="stage-devnav" class="stage-devnav" aria-label="Stage 1 screen preview">
+  <aside id="stage-devnav" class="stage-devnav" aria-label="Dev screen preview">
     <button type="button" data-route="splash" class="devnav-btn">Splash</button>
     <button type="button" data-route="auth" class="devnav-btn">Auth</button>
     <button type="button" data-route="intro" class="devnav-btn">Intro</button>
     <button type="button" data-route="map" class="devnav-btn">Map</button>
+    <button type="button" data-route="profile" class="devnav-btn">Profile</button>
     <button type="button" data-route="kingdom" class="devnav-btn">Kingdom</button>
     <button type="button" data-route="dialogue" class="devnav-btn">Dialogue</button>
     <button type="button" data-route="quest-brief" class="devnav-btn">Brief</button>

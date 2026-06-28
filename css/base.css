@@ -22,6 +22,15 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+body.booting #app {
+  opacity: 0;
+}
+
+body.ready #app {
+  opacity: 1;
+  transition: opacity 0.4s ease;
+}
+
 #app {
   position: relative;
   min-height: 100dvh;
