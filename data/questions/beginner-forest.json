@@ -16,7 +16,34 @@
       "rewards": { "xp": 40, "coins": 15 },
       "difficulty": 1,
       "parMinutes": 4,
-      "trials": 3
+      "trials": 3,
+      "challenges": [
+        {
+          "type": "mcq",
+          "badge": "Variables",
+          "prompt": "What best describes a variable in programming?",
+          "options": ["A named storage location for data", "A type of loop", "A compiler error", "A comment in code"],
+          "answer": 0,
+          "explain": "A variable is a named container that holds a value you can read and change."
+        },
+        {
+          "type": "mcq",
+          "badge": "Naming",
+          "prompt": "Which is a valid Java variable name?",
+          "options": ["2speed", "my-value", "totalCount", "class"],
+          "answer": 2,
+          "explain": "Names start with a letter or underscore. totalCount is valid; class is a reserved keyword."
+        },
+        {
+          "type": "output",
+          "badge": "Output",
+          "prompt": "What prints to the console?",
+          "code": "int score = 10;\nSystem.out.println(score);",
+          "options": ["10", "score", "0", "Error"],
+          "answer": 0,
+          "explain": "println prints the value stored in score, which is 10."
+        }
+      ]
     },
     {
       "id": "grove",
@@ -33,7 +60,34 @@
       "rewards": { "xp": 50, "coins": 18 },
       "difficulty": 1,
       "parMinutes": 5,
-      "trials": 3
+      "trials": 3,
+      "challenges": [
+        {
+          "type": "mcq",
+          "badge": "Types",
+          "prompt": "Which type stores true or false?",
+          "options": ["int", "double", "boolean", "String"],
+          "answer": 2,
+          "explain": "boolean holds logical values: true or false."
+        },
+        {
+          "type": "output",
+          "badge": "Output",
+          "prompt": "What is printed?",
+          "code": "double pi = 3.5;\nSystem.out.println(pi);",
+          "options": ["3", "3.5", "3.50", "Error"],
+          "answer": 1,
+          "explain": "println outputs the double value 3.5 as stored."
+        },
+        {
+          "type": "debug",
+          "badge": "Debug",
+          "prompt": "Which line contains an error?",
+          "code": "int age = 21\nString name = \"Ada\";\nSystem.out.println(name);",
+          "answer": 0,
+          "explain": "Line 1 is missing a semicolon at the end."
+        }
+      ]
     },
     {
       "id": "stream",
@@ -50,7 +104,34 @@
       "rewards": { "xp": 55, "coins": 20 },
       "difficulty": 2,
       "parMinutes": 5,
-      "trials": 3
+      "trials": 3,
+      "challenges": [
+        {
+          "type": "output",
+          "badge": "Output",
+          "prompt": "What is the result printed?",
+          "code": "int a = 10;\nint b = 3;\nSystem.out.println(a % b);",
+          "options": ["1", "3", "3.33", "0"],
+          "answer": 0,
+          "explain": "The modulo operator % returns the remainder: 10 divided by 3 leaves 1."
+        },
+        {
+          "type": "mcq",
+          "badge": "Operators",
+          "prompt": "What does the expression (5 > 3) evaluate to?",
+          "options": ["5", "3", "true", "false"],
+          "answer": 2,
+          "explain": "The > operator compares values and returns a boolean. 5 is greater than 3, so true."
+        },
+        {
+          "type": "debug",
+          "badge": "Debug",
+          "prompt": "Which line will cause a problem?",
+          "code": "int x = 5;\nint y = 0;\nSystem.out.println(x / y);",
+          "answer": 2,
+          "explain": "Dividing an int by zero throws an ArithmeticException at runtime."
+        }
+      ]
     },
     {
       "id": "bridge",
@@ -67,7 +148,38 @@
       "rewards": { "xp": 60, "coins": 25 },
       "difficulty": 2,
       "parMinutes": 6,
-      "trials": 3
+      "trials": 3,
+      "challenges": [
+        {
+          "type": "output",
+          "badge": "Output",
+          "prompt": "What prints to the console?",
+          "code": "int x = 5;\nSystem.out.println(++x);",
+          "options": ["5", "6", "4", "Error"],
+          "answer": 1,
+          "explain": "Prefix ++x increments before use, so x becomes 6 and that value is printed."
+        },
+        {
+          "type": "output",
+          "badge": "Output",
+          "prompt": "What prints to the console?",
+          "code": "int x = 5;\nSystem.out.println(x++);",
+          "options": ["5", "6", "4", "Error"],
+          "answer": 0,
+          "explain": "Postfix x++ uses the old value first (5), then increments x to 6."
+        },
+        {
+          "type": "order",
+          "badge": "Order",
+          "prompt": "Arrange the lines to declare x as 5, then print it.",
+          "blocks": [
+            "System.out.println(x);",
+            "int x = 5;"
+          ],
+          "answer": [1, 0],
+          "explain": "You must declare the variable before you can print it."
+        }
+      ]
     },
     {
       "id": "boss",
@@ -84,7 +196,39 @@
       "rewards": { "xp": 120, "coins": 50 },
       "difficulty": 3,
       "parMinutes": 8,
-      "trials": 3
+      "trials": 3,
+      "challenges": [
+        {
+          "type": "output",
+          "badge": "Phase 1",
+          "prompt": "What is the output?",
+          "code": "int a = 10;\nSystem.out.println(a++);",
+          "options": ["11", "10", "9", "Error"],
+          "answer": 1,
+          "explain": "Postfix a++ prints 10, then increments a to 11."
+        },
+        {
+          "type": "debug",
+          "badge": "Phase 2",
+          "prompt": "Find the line that breaks compilation.",
+          "code": "int count = 0;\ncount = count + 1;\nSystem.out.println(count)",
+          "answer": 2,
+          "explain": "The println line is missing its semicolon."
+        },
+        {
+          "type": "order",
+          "badge": "Phase 3",
+          "prompt": "Order the code to print 1 then 2.",
+          "blocks": [
+            "System.out.println(t);",
+            "int t = 1;",
+            "t = t + 1;",
+            "System.out.println(t);"
+          ],
+          "answer": [1, 0, 2, 3],
+          "explain": "Declare t, print 1, increment to 2, print again."
+        }
+      ]
     }
   ]
 }

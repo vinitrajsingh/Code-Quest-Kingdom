@@ -136,6 +136,14 @@ export function addCoins(amount) {
   flush();
 }
 
+export function recordAnswer(correct) {
+  if (!player) return;
+  if (!player.stats) player.stats = { correct: 0, total: 0 };
+  player.stats.total += 1;
+  if (correct) player.stats.correct += 1;
+  flush();
+}
+
 export function xpToLevel(xp) {
   return Math.floor(xp / 100) + 1;
 }

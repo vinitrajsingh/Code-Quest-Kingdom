@@ -1,4 +1,4 @@
-import { initRouter, goTo, currentScreen, setSessionCheck, setOnNavigate } from './router.js';
+import { initRouter, goTo, setSessionCheck, setOnNavigate } from './router.js';
 import {
   initState, isLoggedIn, registerKnight, loginKnight, resumeSession, logout,
   markIntroSeen, getPlayer, getAllProfiles, clearKingdom, getCurrentKingdom,
@@ -8,8 +8,13 @@ import { syncHud, renderProfile, renderKnightList, setAuthTab, getSelectedAvatar
 import { loadKingdoms, renderWorldMap, bindMapEvents, renderKingdomHeader, showMapToast } from './map.js';
 import {
   preloadQuests, renderKingdomHub, bindKingdomPath, openDialogue, renderQuestBrief,
-  renderQuestPreview, finishQuestPreview, getActiveQuest, showReplayDialogue,
+  finalizeQuest, getActiveQuest, showReplayDialogue,
 } from './kingdom.js';
+import {
+  startSession, renderChallenge, submitChallenge, renderResult,
+  advanceAfterResult, abandonSession,
+} from './challenges.js';
+import { stopTimer } from './timer.js';
 
 const STUB_LABELS = {
   inventory: { title: 'Inventory', desc: 'Items and consumables arrive in Stage 7.' },
@@ -48,6 +53,7 @@ function refreshAuth() {
 }
 
 function handleNavigate(name) {
+  if (name !== 'challenge' && name !== 'result') stopTimer();
   syncHud();
   if (name === 'map') renderWorldMap();
   if (name === 'profile') renderProfile();
@@ -180,6 +186,56 @@ function bindMap() {
   bindMapEvents(() => goTo('kingdom'));
 }
 
+function beginTrials(quest) {
+  if (!quest?.challenges?.length) return;
+  startSession(quest);
+  renderChallenge();
+  goTo('challenge');
+}
+
+async function finishTrialsFlow() {
+  const outcome = await finalizeQuest();
+  abandonSession();
+  syncHud();
+  await renderKingdomHub();
+  renderWorldMap();
+  if (outcome === 'boss') {
+    clearKingdom(getCurrentKingdom());
+    renderWorldMap();
+    goTo('kingdom-cleared');
+  } else {
+    goTo('kingdom');
+  }
+}
+
+function bindChallenges() {
+  window.addEventListener('cqk:submit', () => {
+    const pick = submitChallenge();
+    if (pick?.needPick) return;
+    renderResult();
+    goTo('result');
+  });
+
+  document.getElementById('result-card')?.addEventListener('click', async e => {
+    if (e.target.id !== 'result-continue') return;
+
+    const next = advanceAfterResult();
+    if (next === 'retry') {
+      renderChallenge();
+      goTo('challenge');
+      return;
+    }
+    if (next === 'challenge') {
+      renderChallenge();
+      goTo('challenge');
+      return;
+    }
+    if (next === 'quest-done') {
+      await finishTrialsFlow();
+    }
+  });
+}
+
 function openQuestFlow(mode, quest) {
   if (mode === 'replay') {
     showReplayDialogue(quest);
@@ -192,6 +248,8 @@ function openQuestFlow(mode, quest) {
 
 function bindKingdom() {
   document.getElementById('kingdom-back')?.addEventListener('click', () => {
+    abandonSession();
+    stopTimer();
     renderWorldMap();
     goTo('map');
   });
@@ -212,26 +270,7 @@ function bindKingdom() {
   document.getElementById('brief-start')?.addEventListener('click', () => {
     const quest = getActiveQuest();
     if (!quest) return;
-    renderQuestPreview(quest);
-    goTo('quest-preview');
-  });
-
-  document.getElementById('preview-back')?.addEventListener('click', () => goTo('kingdom'));
-
-  document.getElementById('preview-complete')?.addEventListener('click', async () => {
-    const quest = getActiveQuest();
-    if (!quest) return;
-    const outcome = await finishQuestPreview();
-    syncHud();
-    await renderKingdomHub();
-    renderWorldMap();
-    if (outcome === 'boss') {
-      clearKingdom(getCurrentKingdom());
-      renderWorldMap();
-      goTo('kingdom-cleared');
-    } else {
-      goTo('kingdom');
-    }
+    beginTrials(quest);
   });
 }
 
@@ -253,36 +292,6 @@ function bindProfile() {
   });
 }
 
-function bindOptions() {
-  document.querySelectorAll('.option-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const grid = btn.closest('.option-grid');
-      grid?.querySelectorAll('.option-btn').forEach(b => b.classList.remove('option-selected'));
-      btn.classList.add('option-selected');
-    });
-  });
-}
-
-function demoTimer() {
-  const ring = document.querySelector('.timer-ring');
-  if (!ring) return;
-  let sec = 45;
-  const label = ring.querySelector('.timer-text');
-  const fill = ring.querySelector('.timer-fill');
-  const max = 97.4;
-
-  setInterval(() => {
-    if (currentScreen() !== 'challenge') return;
-    sec = Math.max(0, sec - 1);
-    const m = Math.floor(sec / 60);
-    const s = sec % 60;
-    if (label) label.textContent = `${m}:${s.toString().padStart(2, '0')}`;
-    const pct = sec / 45;
-    if (fill) fill.style.strokeDashoffset = max * (1 - pct);
-    ring.dataset.state = sec <= 10 ? 'danger' : sec <= 20 ? 'warn' : 'safe';
-  }, 1000);
-}
-
 async function boot() {
   initState();
   initRouter();
@@ -299,9 +308,8 @@ async function boot() {
   bindNav();
   bindMap();
   bindKingdom();
+  bindChallenges();
   bindProfile();
-  bindOptions();
-  demoTimer();
 
   const session = loadSession();
   if (session?.key && resumeSession(session.key)) {

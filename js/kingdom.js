@@ -29,6 +29,7 @@ export async function loadKingdomQuests(kingdomId) {
 }
 
 export async function preloadQuests() {
+  cache.delete('forest');
   await loadKingdomQuests('forest');
 }
 
@@ -171,25 +172,16 @@ export function renderQuestBrief(quest) {
   if (trialsEl) trialsEl.textContent = `${quest.trials} trials`;
 }
 
-export function renderQuestPreview(quest) {
-  const title = document.getElementById('preview-title');
-  const sub = document.getElementById('preview-sub');
-  if (title) title.textContent = quest.title;
-  if (sub) sub.textContent = `${quest.trials} coding trials — full gameplay ships in Stage 5.`;
-}
-
-export async function finishQuestPreview() {
+export async function finalizeQuest() {
   const kingdomId = getCurrentKingdom();
   const data = await loadKingdomQuests(kingdomId);
-  if (!activeQuest || !data) return;
+  if (!activeQuest || !data) return null;
 
   completeQuest(kingdomId, activeQuest.id, data.quests.length);
   addXp(activeQuest.rewards.xp);
   addCoins(activeQuest.rewards.coins);
 
-  if (activeQuest.type === 'boss') {
-    return 'boss';
-  }
+  if (activeQuest.type === 'boss') return 'boss';
   return 'kingdom';
 }
 
@@ -203,7 +195,7 @@ export function showReplayDialogue(quest) {
   if (portrait) portrait.textContent = quest.npc.portrait;
   if (name) name.textContent = quest.npc.name;
   if (text) {
-    text.textContent = `You've already cleared ${quest.area}. Replay for practice when trials go live.`;
+    text.textContent = `You've already cleared ${quest.area}. Replay trials will return in a later update.`;
     text.classList.remove('dialogue-typing');
   }
   if (accept) {

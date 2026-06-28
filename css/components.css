@@ -257,6 +257,10 @@
   color: var(--code-orange);
 }
 
+.tok-str {
+  color: var(--code-green);
+}
+
 .timer-ring {
   position: relative;
   width: 44px;

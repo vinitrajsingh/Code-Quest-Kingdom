@@ -922,14 +922,134 @@
   gap: var(--space-lg);
 }
 
+.challenge-stage .btn-wide {
+  margin-top: auto;
+}
+
+.challenge-stage.challenge-enter {
+  animation: fade-up 0.4s ease;
+}
+
+.challenge-timeout-msg {
+  font-size: 0.82rem;
+  color: var(--warn);
+  text-align: center;
+}
+
+.debug-lines {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.debug-line {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  text-align: left;
+  background: var(--ink-soft);
+  border: 1px solid rgba(232, 224, 212, 0.08);
+  border-radius: var(--radius-md);
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.debug-line code {
+  font-family: var(--font-code);
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+
+.debug-num {
+  font-family: var(--font-code);
+  font-size: 0.75rem;
+  color: var(--ghost-dim);
+  min-width: 1.4rem;
+}
+
+.debug-selected {
+  border-color: var(--gold);
+  background: rgba(201, 162, 39, 0.08);
+}
+
+.order-hint {
+  font-size: 0.82rem;
+  color: var(--ghost-dim);
+}
+
+.order-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+}
+
+.order-block {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: var(--ink-soft);
+  border: 1px solid rgba(232, 224, 212, 0.1);
+  border-radius: var(--radius-md);
+  cursor: grab;
+  transition: border-color 0.2s, transform 0.15s;
+}
+
+.order-block:active {
+  cursor: grabbing;
+}
+
+.order-dragging {
+  opacity: 0.55;
+  transform: scale(0.98);
+}
+
+.order-grip {
+  color: var(--ghost-dim);
+  font-size: 0.9rem;
+}
+
+.order-block code {
+  font-family: var(--font-code);
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
+
+.option-grid .option-btn {
+  animation: fade-up 0.35s ease backwards;
+}
+
+.option-grid .option-btn:nth-child(1) { animation-delay: 0.04s; }
+.option-grid .option-btn:nth-child(2) { animation-delay: 0.08s; }
+.option-grid .option-btn:nth-child(3) { animation-delay: 0.12s; }
+.option-grid .option-btn:nth-child(4) { animation-delay: 0.16s; }
+
+.result-wrong .result-icon {
+  background: rgba(139, 38, 53, 0.15);
+  color: var(--blood);
+  border-color: var(--blood);
+}
+
+.result-wrong h2 {
+  color: var(--ember);
+}
+
+.loot-muted {
+  font-size: 0.85rem !important;
+  color: var(--ghost-dim) !important;
+}
+
+@media (max-width: 480px) {
+  .order-block code {
+    font-size: 0.72rem;
+  }
+}
+
 .challenge-prompt {
   font-size: 1.15rem;
   font-family: var(--font-body);
   font-weight: 600;
-}
-
-.challenge-stage .btn-wide {
-  margin-top: auto;
 }
 
 .result-card {
