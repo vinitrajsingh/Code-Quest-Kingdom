@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="CodeQuest Kingdom — learn code, save the realm.">
+  <meta name="theme-color" content="#0a0e14">
+  <title>CodeQuest Kingdom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;900&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/tokens.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/animations.css">
+</head>
+<body>
+  <div class="grain" aria-hidden="true"></div>
+  <div class="vignette" aria-hidden="true"></div>
+
+  <div id="app">
+    <section id="screen-splash" class="screen screen-active" data-screen="splash">
+      <div class="splash-inner">
+        <div class="splash-emblem">
+          <svg viewBox="0 0 120 120" class="emblem-svg" aria-hidden="true">
+            <polygon points="60,8 108,35 108,85 60,112 12,85 12,35" fill="none" stroke="currentColor" stroke-width="2"/>
+            <text x="60" y="68" text-anchor="middle" class="emblem-char">&lt;/&gt;</text>
+          </svg>
+        </div>
+        <h1 class="splash-title">CodeQuest</h1>
+        <p class="splash-sub">Kingdom</p>
+        <p class="splash-tagline">Learn code. Save the realm.</p>
+        <div class="splash-loader">
+          <span class="loader-bar"></span>
+        </div>
+        <button type="button" class="btn-primary splash-enter" id="splash-skip">Enter Realm</button>
+      </div>
+    </section>
+
+    <section id="screen-auth" class="screen" data-screen="auth">
+      <div class="auth-layout">
+        <div class="auth-hero">
+          <p class="auth-kicker">Knight Registration</p>
+          <h2 class="auth-heading">Claim Your Name</h2>
+          <p class="auth-desc">Every legend starts with a single line of code.</p>
+        </div>
+        <form class="panel panel-cut auth-form" id="auth-form">
+          <label class="field-label" for="knight-name">Knight Name</label>
+          <input type="text" id="knight-name" class="field-input" placeholder="Sir Variables" maxlength="20" autocomplete="username">
+          <p class="field-hint">Stage 1 preview — full login in Stage 2</p>
+          <button type="submit" class="btn-primary btn-wide">Begin Journey</button>
+        </form>
+      </div>
+    </section>
+
+    <section id="screen-intro" class="screen" data-screen="intro">
+      <div class="intro-frame panel panel-cut">
+        <div class="intro-slide intro-slide-active" data-slide="0">
+          <span class="intro-chapter">Chapter I</span>
+          <h2>The Crystals Faded</h2>
+          <p>Five kingdoms once thrived on Code Crystals — sources of logic and order.</p>
+        </div>
+        <div class="intro-slide" data-slide="1">
+          <span class="intro-chapter">Chapter II</span>
+          <h2>The Bug Plague</h2>
+          <p>Corruption spread. Bridges collapsed. Dragons guard broken syntax at every gate.</p>
+        </div>
+        <div class="intro-slide" data-slide="2">
+          <span class="intro-chapter">Chapter III</span>
+          <h2>Your Quest</h2>
+          <p>You are a Knight of Logic. Answer truly. Restore the realm.</p>
+        </div>
+        <div class="intro-controls">
+          <button type="button" class="btn-ghost" id="intro-skip">Skip</button>
+          <div class="intro-dots">
+            <span class="dot dot-active"></span>
+            <span class="dot"></span>
+            <span class="dot"></span>
+          </div>
+          <button type="button" class="btn-primary" id="intro-next">Continue</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-map" class="screen" data-screen="map">
+      <header class="hud-bar">
+        <div class="hud-left">
+          <span class="hud-knight" id="hud-name">Knight</span>
+          <span class="hud-level">Lv <strong id="hud-level">1</strong></span>
+        </div>
+        <div class="hud-center">
+          <div class="xp-track">
+            <div class="xp-fill" id="hud-xp-fill" style="width: 12%"></div>
+          </div>
+        </div>
+        <div class="hud-right">
+          <span class="hud-coin"><span class="coin-icon">◆</span> <strong id="hud-coins">0</strong></span>
+        </div>
+      </header>
+
+      <main class="map-stage">
+        <div class="map-header">
+          <h2 class="map-title">Realm Map</h2>
+          <p class="map-sub">Choose a kingdom to restore</p>
+        </div>
+        <div class="map-canvas">
+          <svg class="map-paths" viewBox="0 0 400 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
+            <path d="M200 480 L200 400 L120 340 L200 260 L280 200 L200 120 L200 40" fill="none" stroke="url(#pathGrad)" stroke-width="3" stroke-dasharray="8 6" opacity="0.5"/>
+            <defs>
+              <linearGradient id="pathGrad" x1="0%" y1="100%" x2="0%" y2="0%">
+                <stop offset="0%" stop-color="#c9a227"/>
+                <stop offset="100%" stop-color="#1a3a2a"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <button type="button" class="kingdom-node kingdom-active" data-kingdom="forest">
+            <span class="node-icon">🌳</span>
+            <span class="node-label">Beginner Forest</span>
+            <span class="node-status">Available</span>
+          </button>
+          <button type="button" class="kingdom-node kingdom-locked" data-kingdom="village" disabled>
+            <span class="node-icon">🏘️</span>
+            <span class="node-label">Loop Village</span>
+            <span class="node-status">Locked</span>
+          </button>
+          <button type="button" class="kingdom-node kingdom-locked" data-kingdom="castle" disabled>
+            <span class="node-icon">🏰</span>
+            <span class="node-label">Array Castle</span>
+            <span class="node-status">Locked</span>
+          </button>
+          <button type="button" class="kingdom-node kingdom-locked" data-kingdom="mountain" disabled>
+            <span class="node-icon">🐉</span>
+            <span class="node-label">Dragon Mountain</span>
+            <span class="node-status">Locked</span>
+          </button>
+          <button type="button" class="kingdom-node kingdom-locked" data-kingdom="final" disabled>
+            <span class="node-icon">👑</span>
+            <span class="node-label">Final Kingdom</span>
+            <span class="node-status">Locked</span>
+          </button>
+        </div>
+      </main>
+
+      <nav class="bottom-nav">
+        <button type="button" class="nav-item nav-active" data-nav="map">
+          <span class="nav-icon">⌖</span>
+          <span>Map</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="inventory">
+          <span class="nav-icon">⚔</span>
+          <span>Items</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="profile">
+          <span class="nav-icon">◉</span>
+          <span>Profile</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="leaderboard">
+          <span class="nav-icon">▲</span>
+          <span>Ranks</span>
+        </button>
+      </nav>
+    </section>
+
+    <section id="screen-kingdom" class="screen" data-screen="kingdom">
+      <header class="hud-bar">
+        <button type="button" class="hud-back" id="kingdom-back">← Map</button>
+        <span class="hud-title">Beginner Forest</span>
+        <span class="hud-coin"><span class="coin-icon">◆</span> <strong>0</strong></span>
+      </header>
+      <main class="kingdom-stage">
+        <div class="kingdom-banner">
+          <h2>Variables &amp; Data Types</h2>
+          <p>4 areas · 1 boss</p>
+        </div>
+        <div class="kingdom-path">
+          <button type="button" class="path-node path-done" data-area="0">
+            <span class="path-dot"></span>
+            <span class="path-name">Forest Entrance</span>
+          </button>
+          <button type="button" class="path-node path-active" data-area="1">
+            <span class="path-dot"></span>
+            <span class="path-name">Variable Grove</span>
+          </button>
+          <button type="button" class="path-node path-locked" data-area="2" disabled>
+            <span class="path-dot"></span>
+            <span class="path-name">Data Stream</span>
+          </button>
+          <button type="button" class="path-node path-locked" data-area="3" disabled>
+            <span class="path-dot"></span>
+            <span class="path-name">Operator Bridge</span>
+          </button>
+          <button type="button" class="path-node path-boss path-locked" data-area="boss" disabled>
+            <span class="path-dot"></span>
+            <span class="path-name">Corrupted Guardian</span>
+          </button>
+        </div>
+      </main>
+    </section>
+
+    <section id="screen-dialogue" class="screen screen-overlay" data-screen="dialogue">
+      <div class="dialogue-box panel panel-cut">
+        <div class="dialogue-portrait">
+          <span class="portrait-frame">🧙</span>
+        </div>
+        <div class="dialogue-body">
+          <span class="dialogue-name">Elder Syntax</span>
+          <p class="dialogue-text">Traveler, the bridge stones only shift for those who speak the language of variables. Will you try?</p>
+          <div class="dialogue-actions">
+            <button type="button" class="btn-ghost" data-route="kingdom">Not Now</button>
+            <button type="button" class="btn-primary" data-route="quest-brief">Accept Quest</button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="screen-quest-brief" class="screen" data-screen="quest-brief">
+      <div class="brief-wrap panel panel-cut">
+        <span class="brief-type">Side Quest</span>
+        <h2 class="brief-title">Fix the Operator Bridge</h2>
+        <p class="brief-objective">Complete 3 coding trials to restore passage.</p>
+        <ul class="brief-rewards">
+          <li><span>+50</span> XP</li>
+          <li><span>+20</span> Coins</li>
+          <li><span>?</span> Item chance</li>
+        </ul>
+        <div class="brief-meta">
+          <span class="brief-diff">★★☆</span>
+          <span class="brief-time">⏱ ~5 min par</span>
+        </div>
+        <button type="button" class="btn-primary btn-wide" data-route="challenge">Start Quest</button>
+        <button type="button" class="btn-ghost btn-wide" data-route="kingdom">Return</button>
+      </div>
+    </section>
+
+    <section id="screen-challenge" class="screen" data-screen="challenge">
+      <header class="challenge-hud">
+        <span class="challenge-progress">Trial 1 / 3</span>
+        <div class="timer-ring" data-state="safe">
+          <svg viewBox="0 0 36 36" class="timer-svg">
+            <circle class="timer-bg" cx="18" cy="18" r="15.5"/>
+            <circle class="timer-fill" cx="18" cy="18" r="15.5" style="stroke-dashoffset: 30"/>
+          </svg>
+          <span class="timer-text">0:45</span>
+        </div>
+      </header>
+      <main class="challenge-stage">
+        <span class="challenge-badge">Output</span>
+        <h2 class="challenge-prompt">What prints to the console?</h2>
+        <pre class="code-block"><code><span class="tok-kw">int</span> x = <span class="tok-num">5</span>;
+System.out.println(++x);</code></pre>
+        <div class="option-grid">
+          <button type="button" class="option-btn">5</button>
+          <button type="button" class="option-btn option-selected">6</button>
+          <button type="button" class="option-btn">4</button>
+          <button type="button" class="option-btn">Error</button>
+        </div>
+        <button type="button" class="btn-primary btn-wide" data-route="result">Submit Answer</button>
+      </main>
+    </section>
+
+    <section id="screen-result" class="screen" data-screen="result">
+      <div class="result-card panel panel-cut result-correct">
+        <div class="result-icon">✓</div>
+        <h2>Correct!</h2>
+        <p class="result-explain">Prefix increment <code>++x</code> adds 1 before the value is read, so 5 becomes 6.</p>
+        <div class="result-loot">
+          <span>+10 XP</span>
+          <span class="loot-bonus">+3 Quick Bonus</span>
+        </div>
+        <button type="button" class="btn-primary btn-wide" data-route="challenge">Next Trial</button>
+      </div>
+    </section>
+
+    <section id="screen-boss-intro" class="screen" data-screen="boss-intro">
+      <div class="boss-intro-wrap">
+        <div class="boss-silhouette">🐉</div>
+        <h2 class="boss-name">Dragon of Increment</h2>
+        <p class="boss-line">"Answer my riddles, knight, or this bridge stays broken forever."</p>
+        <button type="button" class="btn-primary btn-wide" data-route="boss">Begin Battle</button>
+      </div>
+    </section>
+
+    <section id="screen-boss" class="screen" data-screen="boss">
+      <header class="boss-hud">
+        <div class="boss-health">
+          <span class="boss-label">Dragon</span>
+          <div class="health-segments">
+            <span class="seg seg-on"></span>
+            <span class="seg seg-on"></span>
+            <span class="seg"></span>
+          </div>
+        </div>
+        <div class="player-hearts">
+          <span class="heart heart-on">♥</span>
+          <span class="heart heart-on">♥</span>
+          <span class="heart heart-on">♥</span>
+        </div>
+      </header>
+      <main class="challenge-stage boss-stage">
+        <span class="challenge-badge challenge-boss">Phase 1</span>
+        <h2 class="challenge-prompt">What is the output?</h2>
+        <pre class="code-block"><code><span class="tok-kw">int</span> a = <span class="tok-num">10</span>;
+System.out.println(a++);</code></pre>
+        <div class="option-grid">
+          <button type="button" class="option-btn">11</button>
+          <button type="button" class="option-btn">10</button>
+          <button type="button" class="option-btn">9</button>
+          <button type="button" class="option-btn">Error</button>
+        </div>
+        <button type="button" class="btn-primary btn-wide" data-route="kingdom-cleared">Strike</button>
+      </main>
+    </section>
+
+    <section id="screen-kingdom-cleared" class="screen" data-screen="kingdom-cleared">
+      <div class="cleared-wrap panel panel-cut">
+        <div class="crystal-restore"></div>
+        <h2>Forest Restored</h2>
+        <p>The Code Crystal glows again. Loop Village awaits.</p>
+        <dl class="cleared-stats">
+          <div><dt>Accuracy</dt><dd>4/5</dd></div>
+          <div><dt>Time</dt><dd>3:42</dd></div>
+          <div><dt>XP Earned</dt><dd>+120</dd></div>
+        </dl>
+        <button type="button" class="btn-primary btn-wide" data-route="map">Return to Map</button>
+      </div>
+    </section>
+
+    <section id="screen-stub" class="screen" data-screen="stub">
+      <div class="stub-wrap panel panel-cut">
+        <h2 id="stub-title">Coming Soon</h2>
+        <p id="stub-desc">This screen ships in a later stage.</p>
+        <button type="button" class="btn-primary" data-route="map">Back to Map</button>
+      </div>
+    </section>
+  </div>
+
+  <aside id="stage-devnav" class="stage-devnav" aria-label="Stage 1 screen preview">
+    <button type="button" data-route="splash" class="devnav-btn">Splash</button>
+    <button type="button" data-route="auth" class="devnav-btn">Auth</button>
+    <button type="button" data-route="intro" class="devnav-btn">Intro</button>
+    <button type="button" data-route="map" class="devnav-btn">Map</button>
+    <button type="button" data-route="kingdom" class="devnav-btn">Kingdom</button>
+    <button type="button" data-route="dialogue" class="devnav-btn">Dialogue</button>
+    <button type="button" data-route="quest-brief" class="devnav-btn">Brief</button>
+    <button type="button" data-route="challenge" class="devnav-btn">Challenge</button>
+    <button type="button" data-route="result" class="devnav-btn">Result</button>
+    <button type="button" data-route="boss-intro" class="devnav-btn">Boss Intro</button>
+    <button type="button" data-route="boss" class="devnav-btn">Boss</button>
+    <button type="button" data-route="kingdom-cleared" class="devnav-btn">Cleared</button>
+  </aside>
+
+  <script type="module" src="js/router.js"></script>
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

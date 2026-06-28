@@ -1,0 +1,55 @@
+:root {
+  --ink: #0a0e14;
+  --ink-soft: #121820;
+  --ink-raised: #1a222d;
+  --moss: #1a3a2a;
+  --moss-bright: #2d5a42;
+  --gold: #c9a227;
+  --gold-dim: #8a7120;
+  --gold-glow: rgba(201, 162, 39, 0.35);
+  --ember: #d4623a;
+  --blood: #8b2635;
+  --ghost: #e8e0d4;
+  --ghost-dim: #a89f92;
+  --mist: rgba(232, 224, 212, 0.08);
+  --terminal: #0d1117;
+  --terminal-line: #1e2836;
+  --code-green: #7ec699;
+  --code-blue: #6eb5ff;
+  --code-orange: #e5a84b;
+  --safe: #3d9970;
+  --warn: #d4a017;
+  --danger: #c0392b;
+
+  --font-display: 'Cinzel', Georgia, serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-code: 'IBM Plex Mono', 'Consolas', monospace;
+
+  --space-xs: 0.25rem;
+  --space-sm: 0.5rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  --space-2xl: 3rem;
+
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 14px;
+  --cut: 12px;
+
+  --shadow-deep: 0 24px 48px rgba(0, 0, 0, 0.55);
+  --shadow-glow: 0 0 32px var(--gold-glow);
+  --border-ornate: 1px solid rgba(201, 162, 39, 0.25);
+
+  --hud-h: 56px;
+  --nav-h: 64px;
+  --max-w: 480px;
+  --transition: 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@media (min-width: 768px) {
+  :root {
+    --max-w: 560px;
+    --hud-h: 60px;
+  }
+}
