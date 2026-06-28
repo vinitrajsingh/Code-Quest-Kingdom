@@ -46,10 +46,18 @@ function escapeHtml(s) {
 }
 
 function highlightCode(src) {
+  const strings = [];
   let s = escapeHtml(src);
+
+  s = s.replace(/("(?:\\.|[^"\\])*")/g, m => {
+    strings.push(`<span class="tok-str">${m}</span>`);
+    return `\x00S${strings.length - 1}\x00`;
+  });
+
   s = s.replace(/\b(int|double|boolean|String|true|false|System)\b/g, '<span class="tok-kw">$1</span>');
-  s = s.replace(/\b(\d+)\b/g, '<span class="tok-num">$1</span>');
-  s = s.replace(/(".*?")/g, '<span class="tok-str">$1</span>');
+  s = s.replace(/\b(\d+(?:\.\d+)?)\b/g, '<span class="tok-num">$1</span>');
+  s = s.replace(/\x00S(\d+)\x00/g, (_, i) => strings[Number(i)]);
+
   return s;
 }
 

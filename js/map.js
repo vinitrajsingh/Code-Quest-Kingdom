@@ -8,8 +8,6 @@ import {
 let kingdoms = [];
 let toastTimer = null;
 
-const ORDER_TOP = ['82%', '62%', '42%', '22%', '0%'];
-
 export async function loadKingdoms() {
   if (kingdoms.length) return kingdoms;
   const res = await fetch('data/kingdoms.json');
@@ -25,11 +23,26 @@ export function getAllKingdoms() {
   return kingdoms;
 }
 
-function statusLabel(status, progress, requiresLabel) {
-  if (status === 'cleared') return 'Crystal Restored';
-  if (status === 'progress') return progress > 0 ? `In Progress · ${progress}%` : 'In Progress';
-  if (status === 'available') return 'Enter Kingdom';
-  return requiresLabel || 'Locked';
+function statusLabel(status, progress) {
+  if (status === 'cleared') return 'Restored';
+  if (status === 'progress') return progress > 0 ? `${progress}%` : 'Active';
+  if (status === 'available') return 'Enter';
+  return 'Locked';
+}
+
+function renderNodeContent(meta, status, progress) {
+  const showTopic = status !== 'locked';
+  const topic = showTopic ? `<span class="node-topic">${meta.topic}</span>` : '';
+  const badge = statusLabel(status, progress);
+
+  return `
+    <span class="node-icon">${meta.icon}</span>
+    <div class="node-info">
+      <span class="node-label">${meta.name}</span>
+      ${topic}
+    </div>
+    <span class="node-badge node-badge-${status}">${badge}</span>
+  `;
 }
 
 function nodeClass(status) {
@@ -41,7 +54,6 @@ function nodeClass(status) {
 
 export function renderWorldMap() {
   const container = document.getElementById('map-kingdoms');
-  const pathEl = document.getElementById('map-path-glow');
   const summaryEl = document.getElementById('map-progress');
   if (!container || !kingdoms.length) return;
 
@@ -50,7 +62,7 @@ export function renderWorldMap() {
 
   let cleared = 0;
 
-  kingdoms.forEach((meta, idx) => {
+  kingdoms.forEach(meta => {
     const status = player ? getKingdomStatus(meta.id) : 'locked';
     if (status === 'cleared') cleared += 1;
 
@@ -60,25 +72,12 @@ export function renderWorldMap() {
     btn.className = `kingdom-node ${nodeClass(status)}`;
     btn.dataset.kingdom = meta.id;
     btn.dataset.order = String(meta.order);
-    btn.style.top = ORDER_TOP[idx] || '0%';
 
     const crystal = status === 'cleared' ? '<span class="node-crystal">✦</span>' : '';
-
-    btn.innerHTML = `
-      ${crystal}
-      <span class="node-icon">${meta.icon}</span>
-      <span class="node-label">${meta.name}</span>
-      <span class="node-topic">${meta.topic}</span>
-      <span class="node-status">${statusLabel(status, prog, meta.requiresLabel)}</span>
-    `;
+    btn.innerHTML = crystal + renderNodeContent(meta, status, prog);
 
     container.appendChild(btn);
   });
-
-  if (pathEl) {
-    const lit = cleared / kingdoms.length;
-    pathEl.style.opacity = String(0.25 + lit * 0.75);
-  }
 
   if (summaryEl) {
     summaryEl.textContent = `${cleared} / ${kingdoms.length} crystals restored`;
