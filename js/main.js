@@ -19,11 +19,11 @@ import {
   renderBossIntro, startBossBattle, abandonBoss, setBossCallbacks,
   renderKingdomCleared,
 } from './boss.js';
-
-const STUB_LABELS = {
-  inventory: { title: 'Inventory', desc: 'Items and consumables arrive in Stage 7.' },
-  leaderboard: { title: 'Leaderboard', desc: 'Local rankings arrive in Stage 7.' },
-};
+import { preloadItems } from './items.js';
+import {
+  renderInventoryScreen, renderLeaderboardScreen,
+  bindMetaScreen, bindLeaderboardScreen,
+} from './meta.js';
 
 let introIndex = 0;
 let splashTimer = null;
@@ -67,11 +67,13 @@ function handleNavigate(name) {
     renderKingdomHub();
   }
   if (name === 'kingdom-cleared') renderKingdomCleared();
+  if (name === 'inventory') renderInventoryScreen();
+  if (name === 'leaderboard') renderLeaderboardScreen();
   syncNavHighlight(name);
 }
 
 function syncNavHighlight(screen) {
-  const map = { map: 'map', profile: 'profile' };
+  const map = { map: 'map', profile: 'profile', inventory: 'inventory', leaderboard: 'leaderboard' };
   const active = map[screen];
   document.querySelectorAll('.bottom-nav').forEach(nav => {
     nav.querySelectorAll('.nav-item').forEach(item => {
@@ -178,10 +180,12 @@ function bindNav() {
         goTo('profile');
         return;
       }
-      if (STUB_LABELS[nav]) {
-        document.getElementById('stub-title').textContent = STUB_LABELS[nav].title;
-        document.getElementById('stub-desc').textContent = STUB_LABELS[nav].desc;
-        goTo('stub');
+      if (nav === 'inventory') {
+        goTo('inventory');
+        return;
+      }
+      if (nav === 'leaderboard') {
+        goTo('leaderboard');
       }
     });
   });
@@ -336,6 +340,7 @@ async function boot() {
   initRouter();
   await loadKingdoms();
   await preloadQuests();
+  await preloadItems();
   setSessionCheck(() => isLoggedIn());
   setOnNavigate(handleNavigate);
 
@@ -350,6 +355,8 @@ async function boot() {
   bindChallenges();
   bindBoss();
   bindProfile();
+  bindMetaScreen(goTo);
+  bindLeaderboardScreen(goTo);
 
   const session = loadSession();
   if (session?.key && resumeSession(session.key)) {

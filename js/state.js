@@ -45,6 +45,8 @@ function blankPlayer(name, avatar) {
     introSeen: false,
     kingdoms: freshKingdoms(),
     stats: { correct: 0, total: 0 },
+    inventory: {},
+    pendingEffect: null,
     createdAt: Date.now(),
     lastPlayed: Date.now(),
   };
@@ -52,6 +54,12 @@ function blankPlayer(name, avatar) {
 
 export function initState() {
   saveData = loadSave();
+}
+
+function ensurePlayerMeta(p) {
+  if (!p.stats) p.stats = { correct: 0, total: 0 };
+  if (!p.inventory) p.inventory = {};
+  if (p.pendingEffect === undefined) p.pendingEffect = null;
 }
 
 export function getAvatars() {
@@ -69,6 +77,11 @@ export function isLoggedIn() {
 export function getAllProfiles() {
   if (!saveData) return [];
   return Object.values(saveData.profiles)
+    .map(p => {
+      ensureKingdoms(p);
+      ensurePlayerMeta(p);
+      return p;
+    })
     .sort((a, b) => (b.lastPlayed || 0) - (a.lastPlayed || 0));
 }
 
@@ -85,6 +98,7 @@ export function registerKnight(name, avatar) {
 
   player = blankPlayer(shown, avatar);
   ensureKingdoms(player);
+  ensurePlayerMeta(player);
   saveData.profiles[key] = player;
   flush();
   writeSession({ key, since: Date.now() });
@@ -96,6 +110,7 @@ export function loginKnight(key) {
   if (!profile) return false;
   player = profile;
   ensureKingdoms(player);
+  ensurePlayerMeta(player);
   player.lastPlayed = Date.now();
   flush();
   writeSession({ key, since: Date.now() });
@@ -107,6 +122,7 @@ export function resumeSession(key) {
   if (!profile) return false;
   player = profile;
   ensureKingdoms(player);
+  ensurePlayerMeta(player);
   player.lastPlayed = Date.now();
   flush();
   return true;
@@ -134,6 +150,66 @@ export function addCoins(amount) {
   if (!player || amount <= 0) return;
   player.coins += amount;
   flush();
+}
+
+export function spendCoins(amount) {
+  if (!player || amount <= 0 || player.coins < amount) return false;
+  player.coins -= amount;
+  flush();
+  return true;
+}
+
+export function itemCount(id) {
+  return player?.inventory?.[id] || 0;
+}
+
+export function addItem(id, qty = 1) {
+  if (!player || qty <= 0) return false;
+  if (!player.inventory) player.inventory = {};
+  player.inventory[id] = (player.inventory[id] || 0) + qty;
+  flush();
+  return true;
+}
+
+export function removeItem(id, qty = 1) {
+  if (!player || qty <= 0) return false;
+  const have = player.inventory?.[id] || 0;
+  if (have < qty) return false;
+  player.inventory[id] = have - qty;
+  if (player.inventory[id] <= 0) delete player.inventory[id];
+  flush();
+  return true;
+}
+
+export function getPendingEffect() {
+  return player?.pendingEffect ?? null;
+}
+
+export function setPendingEffect(effect) {
+  if (!player) return false;
+  if (player.pendingEffect) return false;
+  player.pendingEffect = effect;
+  flush();
+  return true;
+}
+
+export function clearPendingEffect() {
+  if (!player?.pendingEffect) return null;
+  const effect = player.pendingEffect;
+  player.pendingEffect = null;
+  flush();
+  return effect;
+}
+
+export function clearedCountFor(profile) {
+  if (!profile?.kingdoms) return 0;
+  return KINGDOM_ORDER.filter(id => profile.kingdoms[id]?.cleared).length;
+}
+
+export function accuracyFor(profile) {
+  const total = profile?.stats?.total || 0;
+  if (total <= 0) return null;
+  return Math.round(((profile.stats.correct || 0) / total) * 100);
 }
 
 export function recordAnswer(correct) {

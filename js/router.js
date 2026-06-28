@@ -2,7 +2,8 @@ const screens = new Map();
 
 const PROTECTED = new Set([
   'map', 'kingdom', 'dialogue', 'quest-brief', 'quest-preview', 'challenge',
-  'result', 'boss-intro', 'boss', 'boss-defeat', 'kingdom-cleared', 'stub', 'profile', 'intro',
+  'result', 'boss-intro', 'boss', 'boss-defeat', 'kingdom-cleared',
+  'inventory', 'leaderboard', 'profile', 'intro',
 ]);
 
 let sessionCheck = () => false;

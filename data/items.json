@@ -1,0 +1,34 @@
+[
+  {
+    "id": "hint-scroll",
+    "name": "Hint Scroll",
+    "icon": "📜",
+    "desc": "Remove 2 wrong answers on your next trial.",
+    "price": 15,
+    "effect": "hint"
+  },
+  {
+    "id": "time-crystal",
+    "name": "Time Crystal",
+    "icon": "⏳",
+    "desc": "Adds 15 seconds to your next trial timer.",
+    "price": 20,
+    "effect": "time"
+  },
+  {
+    "id": "wisdom-tome",
+    "name": "Wisdom Tome",
+    "icon": "📖",
+    "desc": "+8 bonus XP on your next correct answer.",
+    "price": 25,
+    "effect": "xp"
+  },
+  {
+    "id": "heart-potion",
+    "name": "Heart Potion",
+    "icon": "🧪",
+    "desc": "Restore 1 heart at the start of a boss battle.",
+    "price": 35,
+    "effect": "heart"
+  }
+]

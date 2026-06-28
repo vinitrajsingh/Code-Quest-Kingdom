@@ -138,7 +138,6 @@
           </svg>
           <div id="map-kingdoms" class="map-kingdoms"></div>
         </div>
-        <div id="map-toast" class="map-toast" hidden></div>
       </main>
 
       <nav class="bottom-nav">
@@ -302,6 +301,71 @@
       </div>
     </section>
 
+    <section id="screen-inventory" class="screen" data-screen="inventory">
+      <header class="hud-bar">
+        <button type="button" class="hud-back" id="inventory-back">← Map</button>
+        <span class="hud-title">Knight Satchel</span>
+        <span class="hud-coin"><span class="coin-icon">◆</span> <strong data-hud="coins">0</strong></span>
+      </header>
+      <div class="meta-tabs">
+        <button type="button" class="meta-tab meta-tab-active" data-meta-tab="bag">Satchel</button>
+        <button type="button" class="meta-tab" data-meta-tab="shop">Merchant</button>
+      </div>
+      <p class="meta-pending" id="meta-pending" hidden></p>
+      <main class="meta-stage" id="meta-stage">
+        <div id="meta-bag" class="meta-pane"></div>
+        <div id="meta-shop" class="meta-pane" hidden>
+          <p class="meta-shop-header">Your coins: <strong id="meta-shop-coins">0</strong> ◆</p>
+          <div id="meta-shop-list"></div>
+        </div>
+      </main>
+      <nav class="bottom-nav">
+        <button type="button" class="nav-item" data-nav="map">
+          <span class="nav-icon">⌖</span>
+          <span>Map</span>
+        </button>
+        <button type="button" class="nav-item nav-active" data-nav="inventory">
+          <span class="nav-icon">⚔</span>
+          <span>Items</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="profile">
+          <span class="nav-icon">◉</span>
+          <span>Profile</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="leaderboard">
+          <span class="nav-icon">▲</span>
+          <span>Ranks</span>
+        </button>
+      </nav>
+    </section>
+
+    <section id="screen-leaderboard" class="screen" data-screen="leaderboard">
+      <header class="hud-bar">
+        <button type="button" class="hud-back" id="leaderboard-back">← Map</button>
+        <span class="hud-title">Hall of Knights</span>
+        <span class="hud-rank" id="leaderboard-your-rank">—</span>
+      </header>
+      <main class="leaderboard-stage" id="leaderboard-list"></main>
+      <nav class="bottom-nav">
+        <button type="button" class="nav-item" data-nav="map">
+          <span class="nav-icon">⌖</span>
+          <span>Map</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="inventory">
+          <span class="nav-icon">⚔</span>
+          <span>Items</span>
+        </button>
+        <button type="button" class="nav-item" data-nav="profile">
+          <span class="nav-icon">◉</span>
+          <span>Profile</span>
+        </button>
+        <button type="button" class="nav-item nav-active" data-nav="leaderboard">
+          <span class="nav-icon">▲</span>
+          <span>Ranks</span>
+        </button>
+      </nav>
+    </section>
+
     <section id="screen-profile" class="screen" data-screen="profile">
       <header class="hud-bar">
         <button type="button" class="hud-back" id="profile-back">← Map</button>
@@ -342,13 +406,7 @@
       </nav>
     </section>
 
-    <section id="screen-stub" class="screen" data-screen="stub">
-      <div class="stub-wrap panel panel-cut">
-        <h2 id="stub-title">Coming Soon</h2>
-        <p id="stub-desc">This screen ships in a later stage.</p>
-        <button type="button" class="btn-primary" data-route="map">Back to Map</button>
-      </div>
-    </section>
+    <div id="app-toast" class="app-toast" hidden></div>
   </div>
 
   <aside id="stage-devnav" class="stage-devnav" aria-label="Dev screen preview">
@@ -357,6 +415,8 @@
     <button type="button" data-route="intro" class="devnav-btn">Intro</button>
     <button type="button" data-route="map" class="devnav-btn">Map</button>
     <button type="button" data-route="profile" class="devnav-btn">Profile</button>
+    <button type="button" data-route="inventory" class="devnav-btn">Items</button>
+    <button type="button" data-route="leaderboard" class="devnav-btn">Ranks</button>
     <button type="button" data-route="kingdom" class="devnav-btn">Kingdom</button>
     <button type="button" data-route="dialogue" class="devnav-btn">Dialogue</button>
     <button type="button" data-route="quest-preview" class="devnav-btn">Preview</button>

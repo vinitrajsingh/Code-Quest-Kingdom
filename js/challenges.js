@@ -1,6 +1,7 @@
 import { addXp, recordAnswer } from './state.js';
 import { startTimer, stopTimer, paintTimer, getRemaining, getLimit, wasExpired, resetExpired, secondsForQuest } from './timer.js';
 import { scoreTrial } from './scoring.js';
+import { consumeTrialStartEffect, consumeXpBoost } from './effects.js';
 
 let session = null;
 let selected = null;
@@ -66,6 +67,12 @@ function shuffle(arr) {
   return a;
 }
 
+function hintHiddenIndices(ch) {
+  if (ch.type !== 'mcq' && ch.type !== 'output') return [];
+  const wrong = ch.options.map((_, i) => i).filter(i => i !== ch.answer);
+  return shuffle(wrong).slice(0, Math.min(2, wrong.length));
+}
+
 export function renderChallenge() {
   const stage = document.getElementById('challenge-stage');
   const progress = document.getElementById('challenge-progress');
@@ -79,7 +86,15 @@ export function renderChallenge() {
 
   if (progress) progress.textContent = trialLabel();
 
-  const markup = buildChallengeMarkup(ch, orderState, { softTimeout: true });
+  const startEffect = consumeTrialStartEffect();
+  const hiddenOptions = startEffect === 'hint' ? hintHiddenIndices(ch) : [];
+  const extraTime = startEffect === 'time' ? 15 : 0;
+
+  const markup = buildChallengeMarkup(ch, orderState, {
+    softTimeout: true,
+    hiddenOptions,
+    hintActive: startEffect === 'hint',
+  });
   stage.innerHTML = markup;
   stage.classList.remove('challenge-enter');
   void stage.offsetWidth;
@@ -93,7 +108,7 @@ export function renderChallenge() {
   }, 'challenge-submit', () => {
     window.dispatchEvent(new CustomEvent('cqk:submit'));
   });
-  startChallengeTimer();
+  startChallengeTimer(extraTime);
 }
 
 function checkAnswer(ch, sel, order) {
@@ -135,11 +150,16 @@ export function buildChallengeMarkup(ch, orderState, opts = {}) {
   if (ch.code) body += codeBlock(ch.code);
 
   if (ch.type === 'mcq' || ch.type === 'output') {
+    const hidden = new Set(opts.hiddenOptions || []);
     body += '<div class="option-grid" id="challenge-options">';
     ch.options.forEach((opt, i) => {
+      if (hidden.has(i)) return;
       body += `<button type="button" class="option-btn" data-opt="${i}">${escapeHtml(opt)}</button>`;
     });
     body += '</div>';
+    if (opts.hintActive) {
+      body += '<p class="challenge-hint-msg">📜 Hint Scroll — two wrong answers removed.</p>';
+    }
   }
 
   if (ch.type === 'debug') {
@@ -219,9 +239,9 @@ function setupOrderDrag(list, stateRef) {
   stateRef.orderState = [...list.querySelectorAll('.order-block')].map(el => Number(el.dataset.idx));
 }
 
-function startChallengeTimer() {
+function startChallengeTimer(extra = 0) {
   const ring = document.getElementById('challenge-timer');
-  const sec = secondsForQuest(session.quest);
+  const sec = secondsForQuest(session.quest) + extra;
   startTimer(
     sec,
     () => paintTimer(ring),
@@ -245,12 +265,15 @@ export function submitChallenge() {
   const ok = result.ok;
 
   recordAnswer(ok);
+  let itemBonus = 0;
   if (ok) {
     session.correct += 1;
     addXp(scores.total);
+    itemBonus = consumeXpBoost();
+    if (itemBonus > 0) addXp(itemBonus);
   }
 
-  session.lastScore = { ...scores, ok, explain: result.explain, timedOut };
+  session.lastScore = { ...scores, ok, explain: result.explain, timedOut, itemBonus };
   return { ok, explain: result.explain, scores, timedOut };
 }
 
@@ -272,6 +295,7 @@ export function renderResult() {
     loot = `<span>+${last.xp} XP</span>`;
     if (last.bonus > 0) loot += `<span class="loot-bonus">+${last.bonus} Quick Bonus</span>`;
     else if (last.timedOut) loot += `<span class="loot-muted">No speed bonus</span>`;
+    if (last.itemBonus > 0) loot += `<span class="loot-bonus">+${last.itemBonus} Tome Bonus</span>`;
   }
 
   const explain = String(last.explain)

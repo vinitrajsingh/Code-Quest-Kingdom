@@ -10,6 +10,7 @@ import {
   startTimer, stopTimer, paintTimer, resetExpired, secondsForBossPhase,
 } from './timer.js';
 import { scoreTrial } from './scoring.js';
+import { consumeHeartPotion } from './effects.js';
 
 let boss = null;
 let input = { selected: null, orderState: [], timedOutFlag: false };
@@ -45,6 +46,7 @@ export function startBossBattle(quest) {
     strikes: 0,
     phaseTimes: [],
   };
+  if (consumeHeartPotion() && boss.hearts < 3) boss.hearts += 1;
   renderBossPhase();
 }
 

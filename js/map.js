@@ -99,16 +99,16 @@ export function renderKingdomHeader(kingdomId) {
 }
 
 export function showMapToast(message) {
-  const toast = document.getElementById('map-toast');
+  const toast = document.getElementById('app-toast') || document.getElementById('map-toast');
   if (!toast) return;
 
   toast.textContent = message;
   toast.hidden = false;
-  toast.classList.add('map-toast-show');
+  toast.classList.add('app-toast-show');
 
   clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
-    toast.classList.remove('map-toast-show');
+    toast.classList.remove('app-toast-show');
     setTimeout(() => { toast.hidden = true; }, 300);
   }, 2800);
 }
