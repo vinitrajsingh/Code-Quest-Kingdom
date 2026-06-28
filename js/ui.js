@@ -97,6 +97,26 @@ export function getSelectedAvatar() {
   return picked?.dataset.avatar || '⚔️';
 }
 
+export function getXpLevel(xp) {
+  return xpToLevel(xp);
+}
+
+export function pulseReward(amount) {
+  document.querySelectorAll('.hud-coin').forEach(el => {
+    el.classList.add('coin-pulse');
+    setTimeout(() => el.classList.remove('coin-pulse'), 700);
+  });
+
+  const hud = document.querySelector('.hud-bar');
+  if (!hud || amount <= 0) return;
+
+  const burst = document.createElement('span');
+  burst.className = 'xp-burst';
+  burst.textContent = `+${amount} XP`;
+  hud.appendChild(burst);
+  setTimeout(() => burst.remove(), 900);
+}
+
 export function bindAvatarPicker() {
   document.querySelectorAll('.avatar-opt').forEach(btn => {
     btn.addEventListener('click', () => {

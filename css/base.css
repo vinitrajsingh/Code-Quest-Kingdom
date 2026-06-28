@@ -37,6 +37,20 @@ body.ready #app {
   z-index: 1;
 }
 
+@media (min-width: 1024px) {
+  body {
+    background: #05080c;
+  }
+
+  #app {
+    max-width: 720px;
+    margin: 0 auto;
+    box-shadow: 0 0 100px rgba(0, 0, 0, 0.65);
+    border-left: 1px solid rgba(201, 162, 39, 0.06);
+    border-right: 1px solid rgba(201, 162, 39, 0.06);
+  }
+}
+
 .grain {
   pointer-events: none;
   position: fixed;
@@ -76,6 +90,7 @@ button {
   border: none;
   background: none;
   color: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
 input {

@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="CodeQuest Kingdom — learn code, save the realm.">
   <meta name="theme-color" content="#0a0e14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="manifest" href="manifest.json">
   <title>CodeQuest Kingdom</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -210,17 +214,6 @@
       </div>
     </section>
 
-    <section id="screen-quest-preview" class="screen" data-screen="quest-preview">
-      <div class="preview-wrap panel panel-cut">
-        <span class="preview-badge">Stage 5 Preview</span>
-        <h2 class="preview-title" id="preview-title">Quest</h2>
-        <p class="preview-sub" id="preview-sub">Trials loading soon.</p>
-        <p class="preview-note">Complete this quest now to unlock the next area. Real coding challenges arrive in Stage 5.</p>
-        <button type="button" class="btn-primary btn-wide" id="preview-complete">Complete Quest</button>
-        <button type="button" class="btn-ghost btn-wide" id="preview-back">Return to Path</button>
-      </div>
-    </section>
-
     <section id="screen-challenge" class="screen" data-screen="challenge">
       <header class="challenge-hud">
         <span class="challenge-progress" id="challenge-progress">Trial 1 / 3</span>
@@ -419,7 +412,6 @@
     <button type="button" data-route="leaderboard" class="devnav-btn">Ranks</button>
     <button type="button" data-route="kingdom" class="devnav-btn">Kingdom</button>
     <button type="button" data-route="dialogue" class="devnav-btn">Dialogue</button>
-    <button type="button" data-route="quest-preview" class="devnav-btn">Preview</button>
     <button type="button" data-route="challenge" class="devnav-btn">Challenge</button>
     <button type="button" data-route="result" class="devnav-btn">Result</button>
     <button type="button" data-route="boss-intro" class="devnav-btn">Boss</button>

@@ -1,7 +1,7 @@
 const screens = new Map();
 
 const PROTECTED = new Set([
-  'map', 'kingdom', 'dialogue', 'quest-brief', 'quest-preview', 'challenge',
+  'map', 'kingdom', 'dialogue', 'quest-brief', 'challenge',
   'result', 'boss-intro', 'boss', 'boss-defeat', 'kingdom-cleared',
   'inventory', 'leaderboard', 'profile', 'intro',
 ]);
@@ -67,4 +67,14 @@ export function currentScreen() {
 
 export function isProtected(name) {
   return PROTECTED.has(name);
+}
+
+export function isValidScreen(name) {
+  return screens.has(name);
+}
+
+export function bootFromHash() {
+  const name = location.hash.replace(/^#/, '');
+  if (!name || !screens.has(name)) return null;
+  return name;
 }

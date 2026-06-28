@@ -58,6 +58,17 @@
   box-shadow: 0 1px 0 #5c4a15, 0 2px 8px var(--gold-glow);
 }
 
+.btn-primary:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.btn-primary:disabled:hover {
+  transform: none;
+}
+
 .btn-ghost {
   display: inline-flex;
   align-items: center;
@@ -133,10 +144,11 @@
   justify-content: space-between;
   gap: var(--space-md);
   height: var(--hud-h);
-  padding: 0 var(--space-md);
+  padding: env(safe-area-inset-top, 0) max(var(--space-md), env(safe-area-inset-right, 0)) 0 max(var(--space-md), env(safe-area-inset-left, 0));
   background: linear-gradient(180deg, rgba(18, 24, 32, 0.95) 0%, rgba(10, 14, 20, 0.88) 100%);
   border-bottom: 1px solid rgba(201, 162, 39, 0.12);
   flex-shrink: 0;
+  position: relative;
 }
 
 .hud-left,
@@ -208,6 +220,10 @@
   font-size: 0.82rem;
   color: var(--ghost-dim);
   padding: var(--space-sm);
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
   transition: color 0.2s;
 }
 
@@ -319,6 +335,7 @@
 
 .option-btn {
   padding: 1rem;
+  min-height: 44px;
   font-family: var(--font-code);
   font-size: 0.95rem;
   text-align: center;
@@ -377,6 +394,7 @@
   align-items: center;
   justify-content: center;
   gap: 2px;
+  min-height: 44px;
   font-size: 0.65rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
@@ -399,11 +417,11 @@
 }
 
 .stage-devnav {
+  display: none;
   position: fixed;
   bottom: calc(var(--nav-h) + 8px);
   right: 8px;
   z-index: 2000;
-  display: flex;
   flex-wrap: wrap;
   gap: 4px;
   max-width: 220px;
@@ -412,6 +430,10 @@
   border: 1px solid rgba(201, 162, 39, 0.2);
   border-radius: var(--radius-md);
   backdrop-filter: blur(8px);
+}
+
+body.dev-mode .stage-devnav {
+  display: flex;
 }
 
 .devnav-btn {
@@ -430,7 +452,7 @@
 }
 
 @media (min-width: 900px) {
-  .stage-devnav {
+  body.dev-mode .stage-devnav {
     bottom: auto;
     top: 12px;
     right: 12px;
@@ -439,21 +461,33 @@
 }
 
 @media (max-width: 480px) {
-  .stage-devnav {
+  body.dev-mode .stage-devnav {
     display: none;
   }
 }
 
-@media (min-width: 481px) {
-  body::after {
-    content: 'Stage 1 · use dev nav →';
-    position: fixed;
-    bottom: 8px;
-    left: 8px;
-    z-index: 2000;
-    font-size: 0.65rem;
-    color: var(--ghost-dim);
-    opacity: 0.5;
-    letter-spacing: 0.04em;
-  }
+button:focus-visible,
+.nav-item:focus-visible,
+.option-btn:focus-visible,
+.path-node:focus-visible,
+.kingdom-node:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.coin-pulse {
+  animation: coin-pulse 0.65s ease;
+}
+
+.xp-burst {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--gold);
+  pointer-events: none;
+  animation: xp-burst 0.85s ease forwards;
+  z-index: 5;
 }

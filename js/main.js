@@ -1,10 +1,10 @@
-import { initRouter, goTo, setSessionCheck, setOnNavigate } from './router.js';
+import { initRouter, goTo, setSessionCheck, setOnNavigate, bootFromHash, isValidScreen } from './router.js';
 import {
   initState, isLoggedIn, registerKnight, loginKnight, resumeSession, logout,
   markIntroSeen, getPlayer, getAllProfiles, clearKingdom, getCurrentKingdom,
 } from './state.js';
 import { loadSession } from './storage.js';
-import { syncHud, renderProfile, renderKnightList, setAuthTab, getSelectedAvatar, bindAvatarPicker } from './ui.js';
+import { syncHud, renderProfile, renderKnightList, setAuthTab, getSelectedAvatar, bindAvatarPicker, pulseReward, getXpLevel } from './ui.js';
 import { loadKingdoms, renderWorldMap, bindMapEvents, renderKingdomHeader, showMapToast } from './map.js';
 import {
   preloadQuests, renderKingdomHub, bindKingdomPath, openDialogue, renderQuestBrief,
@@ -12,7 +12,7 @@ import {
 } from './kingdom.js';
 import {
   startSession, renderChallenge, submitChallenge, renderResult,
-  advanceAfterResult, abandonSession,
+  advanceAfterResult, abandonSession, getSession,
 } from './challenges.js';
 import { stopTimer } from './timer.js';
 import {
@@ -37,11 +37,44 @@ function enterGame() {
   const p = getPlayer();
   syncHud();
   renderWorldMap();
+
+  const hash = bootFromHash();
+  const gameScreens = new Set([
+    'map', 'profile', 'inventory', 'leaderboard', 'kingdom',
+  ]);
+
+  if (hash && isValidScreen(hash)) {
+    if (!p?.introSeen && hash !== 'intro') {
+      goTo('intro', false);
+      return;
+    }
+    if (gameScreens.has(hash) || hash === 'intro') {
+      goTo(hash, false);
+      return;
+    }
+  }
+
   if (p?.introSeen) {
     goTo('map', false);
   } else {
     goTo('intro', false);
   }
+}
+
+function initDevMode() {
+  if (new URLSearchParams(location.search).has('dev')) {
+    document.body.classList.add('dev-mode');
+  }
+}
+
+function initHashRouting() {
+  window.addEventListener('hashchange', () => {
+    if (!isLoggedIn()) return;
+    const hash = bootFromHash();
+    if (!hash || !isValidScreen(hash)) return;
+    const safe = ['map', 'profile', 'inventory', 'leaderboard'];
+    if (safe.includes(hash)) goTo(hash);
+  });
 }
 
 function refreshAuth() {
@@ -193,6 +226,10 @@ function bindNav() {
 
 function bindMap() {
   bindMapEvents(() => goTo('kingdom'));
+  window.addEventListener('cqk:map', () => {
+    renderWorldMap();
+    goTo('map');
+  });
 }
 
 function beginTrials(quest) {
@@ -260,6 +297,15 @@ function bindChallenges() {
 
   document.getElementById('result-card')?.addEventListener('click', async e => {
     if (e.target.id !== 'result-continue') return;
+
+    const last = getSession()?.lastScore;
+    if (last?.ok) {
+      pulseReward(last.xp + (last.itemBonus || 0) + (last.bonus || 0));
+      const gained = last.xp + (last.itemBonus || 0) + (last.bonus || 0);
+      const before = getXpLevel(getPlayer().xp - gained);
+      const after = getXpLevel(getPlayer().xp);
+      if (after > before) showMapToast(`Level ${after}!`);
+    }
 
     const next = advanceAfterResult();
     if (next === 'retry') {
@@ -329,6 +375,7 @@ function bindDevTools() {
 function bindProfile() {
   document.getElementById('profile-back')?.addEventListener('click', () => goTo('map'));
   document.getElementById('logout-btn')?.addEventListener('click', () => {
+    if (!window.confirm('Leave the realm? Your progress is saved on this device.')) return;
     logout();
     refreshAuth();
     goTo('auth');
@@ -336,6 +383,7 @@ function bindProfile() {
 }
 
 async function boot() {
+  initDevMode();
   initState();
   initRouter();
   await loadKingdoms();
@@ -343,6 +391,7 @@ async function boot() {
   await preloadItems();
   setSessionCheck(() => isLoggedIn());
   setOnNavigate(handleNavigate);
+  initHashRouting();
 
   bindRoutes();
   bindDevNav();

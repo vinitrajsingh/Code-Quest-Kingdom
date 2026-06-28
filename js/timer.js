@@ -42,7 +42,7 @@ export function paintTimer(ringEl) {
   if (label) label.textContent = `${m}:${s.toString().padStart(2, '0')}`;
   if (fill) fill.style.strokeDashoffset = String(CIRC * (1 - remain / limit));
   const ratio = remain / limit;
-  ringEl.dataset.state = ratio <= 0.22 ? 'danger' : ratio <= 0.45 ? 'warn' : 'safe';
+  ringEl.dataset.state = remain <= 10 ? 'danger' : ratio <= 0.45 ? 'warn' : 'safe';
 }
 
 function paint() {

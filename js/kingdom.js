@@ -6,6 +6,7 @@ import {
   addXp,
   addCoins,
 } from './state.js';
+import { getKingdomMeta } from './map.js';
 
 const cache = new Map();
 let activeQuest = null;
@@ -31,6 +32,7 @@ export async function loadKingdomQuests(kingdomId) {
 export async function preloadQuests() {
   cache.delete('forest');
   await loadKingdomQuests('forest');
+  await loadKingdomQuests('village');
 }
 
 function areaStatus(data, quest) {
@@ -56,6 +58,23 @@ export async function renderKingdomHub() {
   if (!data) {
     if (progressEl) progressEl.textContent = 'Quests coming soon';
     path.innerHTML = '<p class="kingdom-empty">This kingdom\'s trials are not ready yet.</p>';
+    return;
+  }
+
+  if (data.comingSoon) {
+    const meta = getKingdomMeta(kingdomId);
+    if (progressEl) progressEl.textContent = 'Chapter in progress';
+    path.innerHTML = `
+      <div class="kingdom-soon panel panel-cut">
+        <span class="kingdom-soon-icon">${meta?.icon || '✦'}</span>
+        <h3 class="kingdom-soon-title">${data.teaserTitle || 'Coming Soon'}</h3>
+        <p class="kingdom-soon-text">${data.teaserText || 'New quests are being forged for this kingdom.'}</p>
+        <button type="button" class="btn-ghost btn-wide" id="kingdom-soon-map">Return to Map</button>
+      </div>
+    `;
+    document.getElementById('kingdom-soon-map')?.addEventListener('click', () => {
+      window.dispatchEvent(new CustomEvent('cqk:map'));
+    }, { once: true });
     return;
   }
 

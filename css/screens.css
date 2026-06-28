@@ -709,6 +709,36 @@
   text-align: center;
 }
 
+.kingdom-soon {
+  text-align: center;
+  padding: var(--space-2xl) var(--space-lg);
+  margin-top: var(--space-lg);
+}
+
+.kingdom-soon-icon {
+  font-size: 3rem;
+  display: block;
+  margin-bottom: var(--space-md);
+  filter: drop-shadow(0 0 20px rgba(201, 162, 39, 0.25));
+}
+
+.kingdom-soon-title {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--gold);
+  margin-bottom: var(--space-md);
+}
+
+.kingdom-soon-text {
+  font-size: 0.88rem;
+  color: var(--ghost-dim);
+  line-height: 1.6;
+  margin-bottom: var(--space-xl);
+  max-width: 36ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+
 .path-dot {
   width: 14px;
   height: 14px;
@@ -1507,9 +1537,7 @@
   .shop-buy {
     width: 100%;
   }
-}
 
-@media (max-width: 480px) {
   .dialogue-box {
     grid-template-columns: 1fr;
     text-align: center;
@@ -1535,6 +1563,22 @@
 
   .option-grid {
     grid-template-columns: 1fr;
+  }
+
+  .hud-knight {
+    max-width: 72px;
+  }
+
+  .boss-hud {
+    flex-wrap: wrap;
+    gap: var(--space-sm);
+    justify-content: center;
+  }
+
+  .rank-xp {
+    width: 100%;
+    text-align: right;
+    margin-top: var(--space-xs);
   }
 }
 
