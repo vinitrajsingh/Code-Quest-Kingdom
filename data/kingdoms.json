@@ -1,0 +1,52 @@
+[
+  {
+    "id": "forest",
+    "name": "Beginner Forest",
+    "icon": "🌳",
+    "topic": "Variables & Data Types",
+    "areas": 4,
+    "order": 0,
+    "requires": null,
+    "requiresLabel": "Available from the start"
+  },
+  {
+    "id": "village",
+    "name": "Loop Village",
+    "icon": "🏘️",
+    "topic": "Loops & Conditions",
+    "areas": 4,
+    "order": 1,
+    "requires": "forest",
+    "requiresLabel": "Restore Beginner Forest"
+  },
+  {
+    "id": "castle",
+    "name": "Array Castle",
+    "icon": "🏰",
+    "topic": "Arrays & Strings",
+    "areas": 4,
+    "order": 2,
+    "requires": "village",
+    "requiresLabel": "Restore Loop Village"
+  },
+  {
+    "id": "mountain",
+    "name": "Dragon Mountain",
+    "icon": "🐉",
+    "topic": "Data Structures & Algorithms",
+    "areas": 5,
+    "order": 3,
+    "requires": "castle",
+    "requiresLabel": "Restore Array Castle"
+  },
+  {
+    "id": "final",
+    "name": "Final Kingdom",
+    "icon": "👑",
+    "topic": "Mixed Challenges & Boss",
+    "areas": 3,
+    "order": 4,
+    "requires": "mountain",
+    "requiresLabel": "Restore Dragon Mountain"
+  }
+]

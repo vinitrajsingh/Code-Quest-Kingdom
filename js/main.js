@@ -1,7 +1,11 @@
 import { initRouter, goTo, currentScreen, setSessionCheck, setOnNavigate } from './router.js';
-import { initState, isLoggedIn, registerKnight, loginKnight, resumeSession, logout, markIntroSeen, getPlayer, getAllProfiles } from './state.js';
+import {
+  initState, isLoggedIn, registerKnight, loginKnight, resumeSession, logout,
+  markIntroSeen, getPlayer, getAllProfiles, clearKingdom,
+} from './state.js';
 import { loadSession } from './storage.js';
 import { syncHud, renderProfile, renderKnightList, setAuthTab, getSelectedAvatar, bindAvatarPicker } from './ui.js';
+import { loadKingdoms, renderWorldMap, bindMapEvents, renderKingdomHeader, showMapToast } from './map.js';
 
 const STUB_LABELS = {
   inventory: { title: 'Inventory', desc: 'Items and consumables arrive in Stage 7.' },
@@ -19,6 +23,7 @@ function finishBoot() {
 function enterGame() {
   const p = getPlayer();
   syncHud();
+  renderWorldMap();
   if (p?.introSeen) {
     goTo('map', false);
   } else {
@@ -40,8 +45,10 @@ function refreshAuth() {
 
 function handleNavigate(name) {
   syncHud();
+  if (name === 'map') renderWorldMap();
   if (name === 'profile') renderProfile();
   if (name === 'auth') refreshAuth();
+  if (name === 'kingdom') renderKingdomHeader();
   syncNavHighlight(name);
 }
 
@@ -126,6 +133,7 @@ function bindIntro() {
   function finishIntro() {
     markIntroSeen();
     syncHud();
+    renderWorldMap();
     goTo('map');
   }
 
@@ -162,20 +170,23 @@ function bindNav() {
 }
 
 function bindMap() {
-  document.querySelector('.kingdom-active')?.addEventListener('click', () => {
-    goTo('kingdom');
-  });
+  bindMapEvents(() => goTo('kingdom'));
+}
 
-  document.querySelectorAll('.kingdom-locked').forEach(node => {
-    node.addEventListener('click', () => {
-      node.classList.add('shake');
-      setTimeout(() => node.classList.remove('shake'), 450);
-    });
+function bindDevTools() {
+  document.getElementById('dev-clear-forest')?.addEventListener('click', () => {
+    if (!isLoggedIn()) return;
+    clearKingdom('forest');
+    renderWorldMap();
+    showMapToast('Forest restored — Loop Village unlocked');
   });
 }
 
 function bindKingdom() {
-  document.getElementById('kingdom-back')?.addEventListener('click', () => goTo('map'));
+  document.getElementById('kingdom-back')?.addEventListener('click', () => {
+    renderWorldMap();
+    goTo('map');
+  });
   document.querySelector('.path-active')?.addEventListener('click', () => goTo('dialogue'));
 }
 
@@ -218,14 +229,16 @@ function demoTimer() {
   }, 1000);
 }
 
-function boot() {
+async function boot() {
   initState();
   initRouter();
+  await loadKingdoms();
   setSessionCheck(() => isLoggedIn());
   setOnNavigate(handleNavigate);
 
   bindRoutes();
   bindDevNav();
+  bindDevTools();
   bindAuth();
   bindIntro();
   bindNav();
@@ -238,6 +251,7 @@ function boot() {
   const session = loadSession();
   if (session?.key && resumeSession(session.key)) {
     syncHud();
+    renderWorldMap();
     enterGame();
     finishBoot();
     return;

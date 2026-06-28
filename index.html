@@ -124,44 +124,21 @@
       <main class="map-stage">
         <div class="map-header">
           <h2 class="map-title">Realm Map</h2>
-          <p class="map-sub">Choose a kingdom to restore</p>
+          <p class="map-sub" id="map-progress">0 / 5 crystals restored</p>
         </div>
-        <div class="map-canvas">
+        <div class="map-canvas" id="map-canvas">
           <svg class="map-paths" viewBox="0 0 400 520" preserveAspectRatio="xMidYMid meet" aria-hidden="true">
-            <path d="M200 480 L200 400 L120 340 L200 260 L280 200 L200 120 L200 40" fill="none" stroke="url(#pathGrad)" stroke-width="3" stroke-dasharray="8 6" opacity="0.5"/>
+            <path id="map-path-glow" d="M200 480 L200 400 L120 340 L200 260 L280 200 L200 120 L200 40" fill="none" stroke="url(#pathGrad)" stroke-width="3" stroke-dasharray="8 6" opacity="0.35"/>
             <defs>
               <linearGradient id="pathGrad" x1="0%" y1="100%" x2="0%" y2="0%">
                 <stop offset="0%" stop-color="#c9a227"/>
-                <stop offset="100%" stop-color="#1a3a2a"/>
+                <stop offset="100%" stop-color="#3d9970"/>
               </linearGradient>
             </defs>
           </svg>
-          <button type="button" class="kingdom-node kingdom-active" data-kingdom="forest">
-            <span class="node-icon">🌳</span>
-            <span class="node-label">Beginner Forest</span>
-            <span class="node-status">Available</span>
-          </button>
-          <button type="button" class="kingdom-node kingdom-locked" data-kingdom="village">
-            <span class="node-icon">🏘️</span>
-            <span class="node-label">Loop Village</span>
-            <span class="node-status">Locked</span>
-          </button>
-          <button type="button" class="kingdom-node kingdom-locked" data-kingdom="castle">
-            <span class="node-icon">🏰</span>
-            <span class="node-label">Array Castle</span>
-            <span class="node-status">Locked</span>
-          </button>
-          <button type="button" class="kingdom-node kingdom-locked" data-kingdom="mountain">
-            <span class="node-icon">🐉</span>
-            <span class="node-label">Dragon Mountain</span>
-            <span class="node-status">Locked</span>
-          </button>
-          <button type="button" class="kingdom-node kingdom-locked" data-kingdom="final">
-            <span class="node-icon">👑</span>
-            <span class="node-label">Final Kingdom</span>
-            <span class="node-status">Locked</span>
-          </button>
+          <div id="map-kingdoms" class="map-kingdoms"></div>
         </div>
+        <div id="map-toast" class="map-toast" hidden></div>
       </main>
 
       <nav class="bottom-nav">
@@ -187,7 +164,7 @@
     <section id="screen-kingdom" class="screen" data-screen="kingdom">
       <header class="hud-bar">
         <button type="button" class="hud-back" id="kingdom-back">← Map</button>
-        <span class="hud-title">Beginner Forest</span>
+        <span class="hud-title" id="kingdom-hud-title">Beginner Forest</span>
         <span class="hud-coin"><span class="coin-icon">◆</span> <strong data-hud="coins">0</strong></span>
       </header>
       <main class="kingdom-stage">
@@ -410,6 +387,7 @@ System.out.println(a++);</code></pre>
     <button type="button" data-route="result" class="devnav-btn">Result</button>
     <button type="button" data-route="boss-intro" class="devnav-btn">Boss Intro</button>
     <button type="button" data-route="boss" class="devnav-btn">Boss</button>
+    <button type="button" id="dev-clear-forest" class="devnav-btn">✦ Forest</button>
     <button type="button" data-route="kingdom-cleared" class="devnav-btn">Cleared</button>
   </aside>
 

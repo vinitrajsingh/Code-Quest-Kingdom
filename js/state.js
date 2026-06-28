@@ -2,17 +2,33 @@ import { loadSave, writeSave, writeSession, normalizeName, displayName } from '.
 
 const AVATARS = ['⚔️', '🛡️', '🏹', '✨', '🗡️', '🦉'];
 
+const KINGDOM_ORDER = ['forest', 'village', 'castle', 'mountain', 'final'];
+
 let saveData = null;
 let player = null;
 
 function freshKingdoms() {
-  return {
-    forest: { unlocked: true, cleared: false, progress: 0 },
-    village: { unlocked: false, cleared: false, progress: 0 },
-    castle: { unlocked: false, cleared: false, progress: 0 },
-    mountain: { unlocked: false, cleared: false, progress: 0 },
-    final: { unlocked: false, cleared: false, progress: 0 },
-  };
+  const out = {};
+  KINGDOM_ORDER.forEach(id => {
+    out[id] = {
+      unlocked: id === 'forest',
+      cleared: false,
+      progress: 0,
+    };
+  });
+  return out;
+}
+
+function ensureKingdoms(p) {
+  const defaults = freshKingdoms();
+  if (!p.kingdoms) p.kingdoms = defaults;
+  KINGDOM_ORDER.forEach(id => {
+    if (!p.kingdoms[id]) {
+      p.kingdoms[id] = { ...defaults[id] };
+    } else {
+      p.kingdoms[id] = { ...defaults[id], ...p.kingdoms[id] };
+    }
+  });
 }
 
 function blankPlayer(name, avatar) {
@@ -65,6 +81,7 @@ export function registerKnight(name, avatar) {
   if (saveData.profiles[key]) return { ok: false, reason: 'A knight with this name already exists.' };
 
   player = blankPlayer(shown, avatar);
+  ensureKingdoms(player);
   saveData.profiles[key] = player;
   flush();
   writeSession({ key, since: Date.now() });
@@ -75,6 +92,7 @@ export function loginKnight(key) {
   const profile = saveData.profiles[key];
   if (!profile) return false;
   player = profile;
+  ensureKingdoms(player);
   player.lastPlayed = Date.now();
   flush();
   writeSession({ key, since: Date.now() });
@@ -85,6 +103,7 @@ export function resumeSession(key) {
   const profile = saveData?.profiles[key];
   if (!profile) return false;
   player = profile;
+  ensureKingdoms(player);
   player.lastPlayed = Date.now();
   flush();
   return true;
@@ -131,4 +150,62 @@ function flush() {
 
 export function getSessionKey() {
   return player?.key ?? null;
+}
+
+export function getKingdom(id) {
+  return player?.kingdoms?.[id] ?? null;
+}
+
+export function getKingdomStatus(id) {
+  const k = getKingdom(id);
+  if (!k) return 'locked';
+  if (k.cleared) return 'cleared';
+  if (k.unlocked) return k.progress > 0 ? 'progress' : 'available';
+  return 'locked';
+}
+
+export function setCurrentKingdom(id) {
+  if (!player) return;
+  player.currentKingdom = id;
+  flush();
+}
+
+export function getCurrentKingdom() {
+  return player?.currentKingdom || 'forest';
+}
+
+export function setKingdomProgress(id, progress) {
+  if (!player?.kingdoms?.[id]) return;
+  player.kingdoms[id].progress = Math.max(0, Math.min(100, progress));
+  if (player.kingdoms[id].progress > 0 && !player.kingdoms[id].unlocked) {
+    player.kingdoms[id].unlocked = true;
+  }
+  flush();
+}
+
+export function unlockKingdom(id) {
+  if (!player?.kingdoms?.[id]) return;
+  player.kingdoms[id].unlocked = true;
+  flush();
+}
+
+export function clearKingdom(id) {
+  if (!player?.kingdoms?.[id]) return;
+  player.kingdoms[id].cleared = true;
+  player.kingdoms[id].progress = 100;
+  const idx = KINGDOM_ORDER.indexOf(id);
+  if (idx >= 0 && idx < KINGDOM_ORDER.length - 1) {
+    const next = KINGDOM_ORDER[idx + 1];
+    player.kingdoms[next].unlocked = true;
+  }
+  flush();
+}
+
+export function clearedKingdomCount() {
+  if (!player?.kingdoms) return 0;
+  return KINGDOM_ORDER.filter(id => player.kingdoms[id]?.cleared).length;
+}
+
+export function getKingdomOrder() {
+  return [...KINGDOM_ORDER];
 }
