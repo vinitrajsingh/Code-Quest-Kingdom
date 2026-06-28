@@ -15,6 +15,10 @@ import {
   advanceAfterResult, abandonSession,
 } from './challenges.js';
 import { stopTimer } from './timer.js';
+import {
+  renderBossIntro, startBossBattle, abandonBoss, setBossCallbacks,
+  renderKingdomCleared,
+} from './boss.js';
 
 const STUB_LABELS = {
   inventory: { title: 'Inventory', desc: 'Items and consumables arrive in Stage 7.' },
@@ -53,7 +57,7 @@ function refreshAuth() {
 }
 
 function handleNavigate(name) {
-  if (name !== 'challenge' && name !== 'result') stopTimer();
+  if (name !== 'challenge' && name !== 'result' && name !== 'boss') stopTimer();
   syncHud();
   if (name === 'map') renderWorldMap();
   if (name === 'profile') renderProfile();
@@ -62,6 +66,7 @@ function handleNavigate(name) {
     renderKingdomHeader();
     renderKingdomHub();
   }
+  if (name === 'kingdom-cleared') renderKingdomCleared();
   syncNavHighlight(name);
 }
 
@@ -188,24 +193,57 @@ function bindMap() {
 
 function beginTrials(quest) {
   if (!quest?.challenges?.length) return;
+  if (quest.type === 'boss') {
+    renderBossIntro(quest);
+    goTo('boss-intro');
+    return;
+  }
   startSession(quest);
   renderChallenge();
   goTo('challenge');
 }
 
 async function finishTrialsFlow() {
-  const outcome = await finalizeQuest();
+  await finalizeQuest();
   abandonSession();
   syncHud();
   await renderKingdomHub();
   renderWorldMap();
-  if (outcome === 'boss') {
-    clearKingdom(getCurrentKingdom());
-    renderWorldMap();
-    goTo('kingdom-cleared');
-  } else {
+  goTo('kingdom');
+}
+
+async function finishBossVictoryFlow() {
+  await finalizeQuest();
+  abandonBoss();
+  syncHud();
+  clearKingdom(getCurrentKingdom());
+  renderKingdomCleared();
+  await renderKingdomHub();
+  renderWorldMap();
+  goTo('kingdom-cleared');
+}
+
+function bindBoss() {
+  setBossCallbacks(
+    () => finishBossVictoryFlow(),
+    () => goTo('boss-defeat')
+  );
+
+  document.getElementById('boss-begin')?.addEventListener('click', () => {
+    const quest = getActiveQuest();
+    if (!quest) return;
+    startBossBattle(quest);
+    goTo('boss');
+  });
+
+  document.getElementById('boss-intro-back')?.addEventListener('click', () => goTo('quest-brief'));
+
+  document.getElementById('boss-defeat-retry')?.addEventListener('click', () => {
+    abandonBoss();
     goTo('kingdom');
-  }
+  });
+
+  document.getElementById('cleared-map')?.addEventListener('click', () => goTo('map'));
 }
 
 function bindChallenges() {
@@ -249,6 +287,7 @@ function openQuestFlow(mode, quest) {
 function bindKingdom() {
   document.getElementById('kingdom-back')?.addEventListener('click', () => {
     abandonSession();
+    abandonBoss();
     stopTimer();
     renderWorldMap();
     goTo('map');
@@ -309,6 +348,7 @@ async function boot() {
   bindMap();
   bindKingdom();
   bindChallenges();
+  bindBoss();
   bindProfile();
 
   const session = loadSession();

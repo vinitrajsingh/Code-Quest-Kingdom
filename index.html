@@ -242,55 +242,63 @@
 
     <section id="screen-boss-intro" class="screen" data-screen="boss-intro">
       <div class="boss-intro-wrap">
-        <div class="boss-silhouette">🐉</div>
-        <h2 class="boss-name">Dragon of Increment</h2>
-        <p class="boss-line">"Answer my riddles, knight, or this bridge stays broken forever."</p>
-        <button type="button" class="btn-primary btn-wide" data-route="boss">Begin Battle</button>
+        <div class="boss-silhouette" id="boss-intro-icon">🐉</div>
+        <h2 class="boss-name" id="boss-intro-name">Dragon of Increment</h2>
+        <p class="boss-line" id="boss-intro-line">"Answer my riddles, knight."</p>
+        <p class="boss-rules">3 hearts · 3 phases · hard timers</p>
+        <button type="button" class="btn-primary btn-wide" id="boss-begin">Begin Battle</button>
+        <button type="button" class="btn-ghost btn-wide" id="boss-intro-back">Retreat</button>
       </div>
     </section>
 
     <section id="screen-boss" class="screen" data-screen="boss">
       <header class="boss-hud">
         <div class="boss-health">
-          <span class="boss-label">Dragon</span>
-          <div class="health-segments">
+          <span class="boss-label" id="boss-phase-label">Phase 1 / 3</span>
+          <div class="health-segments" id="boss-segments">
             <span class="seg seg-on"></span>
             <span class="seg seg-on"></span>
-            <span class="seg"></span>
+            <span class="seg seg-on"></span>
           </div>
         </div>
-        <div class="player-hearts">
+        <div class="timer-ring" id="boss-timer" data-state="safe">
+          <svg viewBox="0 0 36 36" class="timer-svg">
+            <circle class="timer-bg" cx="18" cy="18" r="15.5"/>
+            <circle class="timer-fill" cx="18" cy="18" r="15.5"/>
+          </svg>
+          <span class="timer-text">0:45</span>
+        </div>
+        <div class="player-hearts" id="boss-hearts">
           <span class="heart heart-on">♥</span>
           <span class="heart heart-on">♥</span>
           <span class="heart heart-on">♥</span>
         </div>
       </header>
-      <main class="challenge-stage boss-stage">
-        <span class="challenge-badge challenge-boss">Phase 1</span>
-        <h2 class="challenge-prompt">What is the output?</h2>
-        <pre class="code-block"><code><span class="tok-kw">int</span> a = <span class="tok-num">10</span>;
-System.out.println(a++);</code></pre>
-        <div class="option-grid">
-          <button type="button" class="option-btn">11</button>
-          <button type="button" class="option-btn">10</button>
-          <button type="button" class="option-btn">9</button>
-          <button type="button" class="option-btn">Error</button>
-        </div>
-        <button type="button" class="btn-primary btn-wide" data-route="kingdom-cleared">Strike</button>
-      </main>
+      <main class="challenge-stage boss-stage" id="boss-stage"></main>
+      <p class="boss-feedback" id="boss-feedback" hidden></p>
+    </section>
+
+    <section id="screen-boss-defeat" class="screen" data-screen="boss-defeat">
+      <div class="defeat-wrap panel panel-cut">
+        <div class="defeat-icon">💀</div>
+        <h2>The Forest Claims Another...</h2>
+        <p class="defeat-reason" id="boss-defeat-reason">The guardian was too strong.</p>
+        <button type="button" class="btn-primary btn-wide" id="boss-defeat-retry">Return to Path</button>
+      </div>
     </section>
 
     <section id="screen-kingdom-cleared" class="screen" data-screen="kingdom-cleared">
       <div class="cleared-wrap panel panel-cut">
         <div class="crystal-restore"></div>
-        <h2>Forest Restored</h2>
-        <p>The Code Crystal glows again. Loop Village awaits.</p>
+        <h2 id="cleared-title">Forest Restored</h2>
+        <p id="cleared-sub">The Code Crystal glows again.</p>
         <dl class="cleared-stats">
-          <div><dt>Accuracy</dt><dd>4/5</dd></div>
-          <div><dt>Time</dt><dd>3:42</dd></div>
-          <div><dt>XP Earned</dt><dd>+120</dd></div>
+          <div><dt>Phases</dt><dd id="cleared-accuracy">3/3</dd></div>
+          <div><dt>Time</dt><dd id="cleared-time">0:00</dd></div>
+          <div><dt>Quest XP</dt><dd id="cleared-xp">+0</dd></div>
+          <div><dt>Coins</dt><dd id="cleared-coins">+0</dd></div>
         </dl>
-        <button type="button" class="btn-primary btn-wide" data-route="map">Return to Map</button>
+        <button type="button" class="btn-primary btn-wide" id="cleared-map">Return to Map</button>
       </div>
     </section>
 
@@ -354,8 +362,7 @@ System.out.println(a++);</code></pre>
     <button type="button" data-route="quest-preview" class="devnav-btn">Preview</button>
     <button type="button" data-route="challenge" class="devnav-btn">Challenge</button>
     <button type="button" data-route="result" class="devnav-btn">Result</button>
-    <button type="button" data-route="boss-intro" class="devnav-btn">Boss Intro</button>
-    <button type="button" data-route="boss" class="devnav-btn">Boss</button>
+    <button type="button" data-route="boss-intro" class="devnav-btn">Boss</button>
     <button type="button" id="dev-clear-forest" class="devnav-btn">✦ Forest</button>
     <button type="button" data-route="kingdom-cleared" class="devnav-btn">Cleared</button>
   </aside>

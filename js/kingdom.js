@@ -180,9 +180,6 @@ export async function finalizeQuest() {
   completeQuest(kingdomId, activeQuest.id, data.quests.length);
   addXp(activeQuest.rewards.xp);
   addCoins(activeQuest.rewards.coins);
-
-  if (activeQuest.type === 'boss') return 'boss';
-  return 'kingdom';
 }
 
 export function showReplayDialogue(quest) {

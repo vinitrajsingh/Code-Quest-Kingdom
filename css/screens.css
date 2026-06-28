@@ -1132,8 +1132,69 @@
   font-style: italic;
   color: var(--ghost-dim);
   max-width: 32ch;
-  margin-bottom: var(--space-2xl);
+  margin-bottom: var(--space-md);
   line-height: 1.6;
+}
+
+.boss-rules {
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ember);
+  margin-bottom: var(--space-2xl);
+}
+
+.boss-stage.boss-hit {
+  animation: boss-hit 0.5s ease;
+}
+
+@keyframes boss-hit {
+  0%, 100% { transform: translateX(0); filter: brightness(1); }
+  25% { transform: translateX(-6px); filter: brightness(1.15); }
+  50% { transform: translateX(6px); }
+  75% { transform: translateX(-3px); }
+}
+
+.boss-feedback {
+  max-width: var(--max-w);
+  width: 100%;
+  margin: 0 auto var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--warn);
+  background: rgba(212, 98, 58, 0.08);
+  border: 1px solid rgba(212, 98, 58, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+.boss-feedback-error {
+  color: var(--blood);
+}
+
+.defeat-wrap {
+  text-align: center;
+}
+
+.defeat-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-md);
+  filter: grayscale(0.3);
+}
+
+.defeat-wrap h2 {
+  font-size: 1.4rem;
+  color: var(--blood);
+  margin-bottom: var(--space-md);
+}
+
+.defeat-reason {
+  color: var(--ghost-dim);
+  margin-bottom: var(--space-xl);
+  line-height: 1.55;
+  max-width: 36ch;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .boss-health {

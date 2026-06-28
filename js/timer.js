@@ -66,9 +66,13 @@ export function resetExpired() {
 }
 
 export function secondsForQuest(quest) {
-  if (quest?.type === 'boss') return 45;
   if (quest?.difficulty >= 2) return 50;
   return 60;
+}
+
+export function secondsForBossPhase(phaseIndex) {
+  const limits = [45, 90, 60];
+  return limits[phaseIndex] ?? 45;
 }
 
 export { CIRC };

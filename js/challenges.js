@@ -79,7 +79,58 @@ export function renderChallenge() {
 
   if (progress) progress.textContent = trialLabel();
 
-  let body = `<span class="challenge-badge">${TYPE_LABELS[ch.type] || ch.badge || 'Trial'}</span>`;
+  const markup = buildChallengeMarkup(ch, orderState, { softTimeout: true });
+  stage.innerHTML = markup;
+  stage.classList.remove('challenge-enter');
+  void stage.offsetWidth;
+  stage.classList.add('challenge-enter');
+
+  wireChallengeInputs({
+    get selected() { return selected; },
+    set selected(v) { selected = v; },
+    get orderState() { return orderState; },
+    set orderState(v) { orderState = v; },
+  }, 'challenge-submit', () => {
+    window.dispatchEvent(new CustomEvent('cqk:submit'));
+  });
+  startChallengeTimer();
+}
+
+function checkAnswer(ch, sel, order) {
+  if (!ch) return { ok: false, explain: '' };
+
+  if (ch.type === 'mcq' || ch.type === 'output') {
+    if (sel === null) return { ok: false, explain: 'Pick an answer first.', needPick: true };
+    return { ok: sel === ch.answer, explain: ch.explain };
+  }
+
+  if (ch.type === 'debug') {
+    if (sel === null) return { ok: false, explain: 'Select a line first.', needPick: true };
+    return { ok: sel === ch.answer, explain: ch.explain };
+  }
+
+  if (ch.type === 'order') {
+    const ok = ch.answer.every((v, i) => order[i] === v);
+    return { ok, explain: ch.explain };
+  }
+
+  return { ok: false, explain: '' };
+}
+
+export function gradeChallenge(ch, sel, order) {
+  return checkAnswer(ch, sel, order);
+}
+
+export function freshOrderState(ch) {
+  return shuffle(ch.blocks ? ch.blocks.map((_, i) => i) : []);
+}
+
+export function buildChallengeMarkup(ch, orderState, opts = {}) {
+  const submitLabel = opts.submitLabel || 'Submit Answer';
+  const submitId = opts.submitId || 'challenge-submit';
+  const badge = opts.badge || TYPE_LABELS[ch.type] || ch.badge || 'Trial';
+
+  let body = `<span class="challenge-badge ${opts.boss ? 'challenge-boss' : ''}">${badge}</span>`;
   body += `<h2 class="challenge-prompt">${escapeHtml(ch.prompt)}</h2>`;
   if (ch.code) body += codeBlock(ch.code);
 
@@ -109,24 +160,20 @@ export function renderChallenge() {
     body += '</div>';
   }
 
-  body += '<p class="challenge-timeout-msg" id="timeout-msg" hidden>Time\'s up — submit still counts, but no speed bonus.</p>';
-  body += '<button type="button" class="btn-primary btn-wide" id="challenge-submit">Submit Answer</button>';
+  if (opts.softTimeout) {
+    body += '<p class="challenge-timeout-msg" id="timeout-msg" hidden>Time\'s up — submit still counts, but no speed bonus.</p>';
+  }
 
-  stage.innerHTML = body;
-  stage.classList.remove('challenge-enter');
-  void stage.offsetWidth;
-  stage.classList.add('challenge-enter');
-
-  bindChallengeInputs();
-  startChallengeTimer();
+  body += `<button type="button" class="btn-primary btn-wide" id="${submitId}">${submitLabel}</button>`;
+  return body;
 }
 
-function bindChallengeInputs() {
+export function wireChallengeInputs(stateRef, submitId, onSubmit) {
   document.querySelectorAll('#challenge-options .option-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#challenge-options .option-btn').forEach(b => b.classList.remove('option-selected'));
       btn.classList.add('option-selected');
-      selected = Number(btn.dataset.opt);
+      stateRef.selected = Number(btn.dataset.opt);
     });
   });
 
@@ -134,19 +181,19 @@ function bindChallengeInputs() {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#debug-lines .debug-line').forEach(b => b.classList.remove('debug-selected'));
       btn.classList.add('debug-selected');
-      selected = Number(btn.dataset.line);
+      stateRef.selected = Number(btn.dataset.line);
     });
   });
 
   const list = document.getElementById('order-list');
-  if (list) setupOrderDrag(list);
+  if (list) {
+    setupOrderDrag(list, stateRef);
+  }
 
-  document.getElementById('challenge-submit')?.addEventListener('click', () => {
-    window.dispatchEvent(new CustomEvent('cqk:submit'));
-  });
+  document.getElementById(submitId)?.addEventListener('click', onSubmit);
 }
 
-function setupOrderDrag(list) {
+function setupOrderDrag(list, stateRef) {
   let dragEl = null;
 
   list.querySelectorAll('.order-block').forEach(block => {
@@ -157,7 +204,7 @@ function setupOrderDrag(list) {
     });
     block.addEventListener('dragend', () => {
       block.classList.remove('order-dragging');
-      syncOrderState(list);
+      stateRef.orderState = [...list.querySelectorAll('.order-block')].map(el => Number(el.dataset.idx));
     });
     block.addEventListener('dragover', e => {
       e.preventDefault();
@@ -169,11 +216,7 @@ function setupOrderDrag(list) {
     });
   });
 
-  syncOrderState(list);
-}
-
-function syncOrderState(list) {
-  orderState = [...list.querySelectorAll('.order-block')].map(el => Number(el.dataset.idx));
+  stateRef.orderState = [...list.querySelectorAll('.order-block')].map(el => Number(el.dataset.idx));
 }
 
 function startChallengeTimer() {
@@ -191,30 +234,9 @@ function startChallengeTimer() {
   paintTimer(ring);
 }
 
-function checkAnswer() {
-  const ch = currentChallenge();
-  if (!ch) return { ok: false, explain: '' };
-
-  if (ch.type === 'mcq' || ch.type === 'output') {
-    if (selected === null) return { ok: false, explain: 'Pick an answer first.', needPick: true };
-    return { ok: selected === ch.answer, explain: ch.explain };
-  }
-
-  if (ch.type === 'debug') {
-    if (selected === null) return { ok: false, explain: 'Select a line first.', needPick: true };
-    return { ok: selected === ch.answer, explain: ch.explain };
-  }
-
-  if (ch.type === 'order') {
-    const ok = ch.answer.every((v, i) => orderState[i] === v);
-    return { ok, explain: ch.explain };
-  }
-
-  return { ok: false, explain: '' };
-}
-
 export function submitChallenge() {
-  const result = checkAnswer();
+  const ch = currentChallenge();
+  const result = checkAnswer(ch, selected, orderState);
   if (result.needPick) return result;
 
   stopTimer();
